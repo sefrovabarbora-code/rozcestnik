@@ -472,6 +472,35 @@ body {
 .mode-badge{font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px;border:0.5px solid}
 .mode-badge.public{background:rgba(64,200,120,0.1);color:#2a9d5c;border-color:rgba(64,200,120,0.3)}
 .mode-badge.internal{background:rgba(240,192,64,0.1);color:#b07d10;border-color:rgba(240,192,64,0.3)}
+
+.ai-chat-wrap{margin-bottom:18px;border:1px solid var(--border2);border-radius:var(--r);overflow:hidden;background:var(--bg2)}
+.ai-chat-header{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--bg3)}
+.ai-chat-header span{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--accent)}
+.ai-chat-header small{font-size:11px;color:var(--text3);font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:0.04em}
+.ai-messages{padding:12px 16px;min-height:0;max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:10px}
+.ai-messages.has-messages{min-height:60px}
+.ai-msg{display:flex;gap:10px;align-items:flex-start}
+.ai-msg.user{flex-direction:row-reverse}
+.ai-bubble{font-size:13px;line-height:1.6;padding:9px 13px;border-radius:var(--r);max-width:85%}
+.ai-msg.user .ai-bubble{background:var(--accent2);border:1px solid rgba(240,192,64,0.25);color:var(--text)}
+.ai-msg.bot .ai-bubble{background:var(--bg3);border:1px solid var(--border);color:var(--text2)}
+.ai-msg.bot .ai-bubble a{color:var(--accent);cursor:pointer;text-decoration:underline}
+.ai-avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;margin-top:2px}
+.ai-avatar.bot{background:var(--accent2);border:1px solid rgba(240,192,64,0.3)}
+.ai-avatar.user{background:var(--bg4);border:1px solid var(--border)}
+.ai-input-row{display:flex;gap:8px;padding:10px 12px;border-top:1px solid var(--border);background:var(--bg3)}
+.ai-input-row input{flex:1;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--rs);color:var(--text);font-family:'Barlow',sans-serif;font-size:14px;padding:8px 12px;outline:none;transition:border-color 0.15s}
+.ai-input-row input:focus{border-color:var(--accent)}
+.ai-input-row input::placeholder{color:var(--text3)}
+.ai-send{background:var(--accent);border:none;border-radius:var(--rs);color:#000;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;padding:8px 16px;cursor:pointer;text-transform:uppercase;letter-spacing:0.04em;transition:background 0.15s;white-space:nowrap}
+.ai-send:hover{background:#ffd050}
+.ai-send:disabled{opacity:0.5;cursor:not-allowed}
+.ai-typing{display:none;padding:4px 0}
+.ai-typing.show{display:flex;gap:4px;align-items:center;padding:0 16px 10px}
+.ai-typing span{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:tdot 1s infinite}
+.ai-typing span:nth-child(2){animation-delay:0.2s}
+.ai-typing span:nth-child(3){animation-delay:0.4s}
+@keyframes tdot{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
 </style>
 </head>
 <body>
@@ -496,6 +525,20 @@ body {
 
 <!-- MAIN -->
 <div class="container">
+  <div class="ai-chat-wrap">
+    <div class="ai-chat-header">
+      <span>🤖 AI Asistent</span>
+      <small>Zeptej se na cokoliv ohledně rally</small>
+    </div>
+    <div class="ai-messages" id="aiMessages"></div>
+    <div class="ai-typing" id="aiTyping">
+      <span></span><span></span><span></span>
+    </div>
+    <div class="ai-input-row">
+      <input type="text" id="aiInput" placeholder="Např. Potřebuji pásku na RZ, kdo zajišťuje ubytování komisařů…" onkeydown="if(event.key==='Enter')sendAiMsg()">
+      <button class="ai-send" id="aiSendBtn" onclick="sendAiMsg()">Odeslat</button>
+    </div>
+  </div>
   <div class="search-wrap">
     <span class="search-icon">⌕</span>
     <input type="text" id="searchInput" placeholder="Hledat jméno, roli, telefon, téma…" oninput="filterBubbles()">
@@ -870,7 +913,7 @@ const DEFAULT_CATEGORIES=[
 
 let categories=[];let editBuffer=null;let selectedEditCatId=null;let activeCatId=null;let pinBuffer='';let isInternal=false;
 
-function getPin(){return localStorage.getItem(PIN_KEY)||'2608'}
+function getPin(){return localStorage.getItem(PIN_KEY)||'9889'}
 function getBins(){try{return JSON.parse(localStorage.getItem(BINS_KEY))||{}}catch(e){return{}}}
 function saveBinsLocal(b){localStorage.setItem(BINS_KEY,JSON.stringify(b))}
 
@@ -1114,6 +1157,159 @@ function importExcel(event){
 function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
 (async()=>{await loadFromCloud();refreshView();})();
+
+
+// ══════════════════════════════════════════════
+// AI ASISTENT
+// ══════════════════════════════════════════════
+const AI_MODEL = 'claude-sonnet-4-20250514';
+
+function buildSystemPrompt() {
+  const cats = getVisible(categories, isInternal);
+  let dataStr = '';
+  cats.forEach(cat => {
+    dataStr += `\n## ${cat.title}\n`;
+    if (cat.contacts.length) {
+      dataStr += 'Kontakty:\n';
+      cat.contacts.forEach(c => {
+        dataStr += `- ${c.name} (${c.role})${c.phone ? ' · tel: '+c.phone : ''}\n`;
+      });
+    }
+    if (cat.info.length) {
+      dataStr += 'Informace:\n';
+      cat.info.forEach(i => {
+        dataStr += `- ${i.label}: ${i.text.replace(/\n/g,' | ')}\n`;
+      });
+    }
+  });
+
+  return `Jsi stručný asistent organizačního výboru 45. SILMET Rally Příbram 2026 (24.–25. 7. 2026).
+
+Odpovídáš POUZE na základě dat níže. Odpovědi jsou krátké — max 3 věty. Vždy uveď konkrétní jméno a telefon pokud existuje.
+
+Pokud dotaz obsahuje neznámý pojem, vysvětli ho jednoduše:
+- RZ = rychlostní zkouška (uzavřený úsek silnice kde závodí auta)
+- OBK = organizační a bezpečnostní kontrolní vozidla
+- MTZ = materiálové a technické zabezpečení (stany, pásky, značení)
+- Dispečink = centrální řídící stanoviště rally, koordinuje vše na trati
+- Traťoví komisaři = pořadatelé na trati kteří zajišťují bezpečnost
+- OV = organizační výbor, tým lidí co organizuje rally
+- Adm. přejímka = administrativní přejímka, kontrola dokumentů posádek
+- HA = historické automobily
+
+Na dotazy mimo rally odpovídej: "Tuto informaci nemám, ptej se na věci ohledně Rally Příbram 2026."
+
+DATA RALLY:
+${dataStr}`;
+}
+
+let aiHistory = [];
+
+async function sendAiMsg() {
+  const input = document.getElementById('aiInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+
+  input.value = '';
+  addAiMessage('user', msg);
+  aiHistory.push({ role: 'user', content: msg });
+
+  const btn = document.getElementById('aiSendBtn');
+  btn.disabled = true;
+  document.getElementById('aiTyping').classList.add('show');
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: AI_MODEL,
+        max_tokens: 1000,
+        system: buildSystemPrompt(),
+        messages: aiHistory
+      })
+    });
+
+    const data = await response.json();
+    const reply = data.content?.[0]?.text || 'Omlouvám se, nepodařilo se získat odpověď.';
+
+    aiHistory.push({ role: 'assistant', content: reply });
+
+    // Find matching category and highlight it
+    const matchedCat = findMatchingCategory(msg + ' ' + reply);
+    addAiMessage('bot', reply, matchedCat);
+
+  } catch(e) {
+    addAiMessage('bot', 'Chyba připojení. Zkuste to znovu.');
+  }
+
+  btn.disabled = false;
+  document.getElementById('aiTyping').classList.remove('show');
+}
+
+function findMatchingCategory(text) {
+  const t = text.toLowerCase();
+  const vis = getVisible(categories, isInternal);
+  let best = null;
+  let bestScore = 0;
+
+  vis.forEach(cat => {
+    let score = 0;
+    const keywords = (cat.keywords || '').toLowerCase().split(' ');
+    keywords.forEach(kw => { if (kw && t.includes(kw)) score++; });
+    cat.contacts.forEach(c => {
+      if (t.includes(c.name.toLowerCase().split(' ')[0])) score += 2;
+    });
+    cat.info.forEach(i => {
+      if (t.includes(i.label.toLowerCase())) score++;
+    });
+    if (score > bestScore) { bestScore = score; best = cat; }
+  });
+
+  return bestScore > 0 ? best : null;
+}
+
+function addAiMessage(role, text, matchedCat) {
+  const msgs = document.getElementById('aiMessages');
+  msgs.classList.add('has-messages');
+
+  const div = document.createElement('div');
+  div.className = 'ai-msg ' + role;
+
+  const avatar = document.createElement('div');
+  avatar.className = 'ai-avatar ' + role;
+  avatar.textContent = role === 'bot' ? '🤖' : '👤';
+
+  const bubble = document.createElement('div');
+  bubble.className = 'ai-bubble';
+  bubble.textContent = text;
+
+  if (role === 'bot' && matchedCat) {
+    const link = document.createElement('div');
+    link.style.cssText = 'margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.08)';
+    link.innerHTML = `<a onclick="scrollToBubble('${matchedCat.id}')">→ Zobrazit: ${matchedCat.icon} ${matchedCat.title}</a>`;
+    bubble.appendChild(link);
+  }
+
+  div.appendChild(avatar);
+  div.appendChild(bubble);
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function scrollToBubble(catId) {
+  // Close any open detail first
+  const detail = document.getElementById('detail');
+  detail.classList.remove('show');
+  document.querySelectorAll('.bubble').forEach(b => b.classList.remove('active'));
+
+  // Find and click the bubble
+  const bub = document.getElementById('bub-' + catId);
+  if (bub) {
+    bub.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setTimeout(() => bub.click(), 400);
+  }
+}
 </script>
 </body>
 </html>
