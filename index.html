@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Rally Příbram 2026 · Rozcestník</title>
+<title>OV Rozcestník · 45. SILMET Rally Příbram 2026</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
@@ -484,14 +484,13 @@ body {
 <div class="top-bar">
   <div class="top-bar-left">
     <h1>Rally Příbram 2026</h1>
-    <p>Interní rozcestník OV · 45. SILMET</p>
+    <p id="modeLabel">Rozcestník · 24.–25. 7. 2026</p>
   </div>
   <div class="top-bar-right">
-    <button class="btn btn-sm" onclick="exportExcel()" title="Export do Excelu">⬇ Excel</button>
-    <label class="btn btn-sm" title="Import z Excelu" style="cursor:pointer">
-      ⬆ Import <input type="file" accept=".xlsx,.xls" style="display:none" onchange="importExcel(event)">
-    </label>
-    <button class="btn btn-sm btn-accent" onclick="handleMainBtn()" id="editBtn">✎ Upravit</button>
+    <span class="mode-badge public" id="modeBadge">Veřejný pohled</span>
+    <button class="btn btn-sm" id="exportBtn" onclick="exportExcel()" style="display:none">⬇ Excel</button>
+    <label class="btn btn-sm" id="importBtn" style="display:none;cursor:pointer">⬆ Import<input type="file" accept=".xlsx,.xls" style="display:none" onchange="importExcel(event)"></label>
+    <button class="btn btn-sm btn-accent" id="mainBtn" onclick="handleMainBtn()">🔒 Přihlásit</button>
   </div>
 </div>
 
@@ -626,7 +625,7 @@ body {
     </div>
     <div style="padding:14px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px">
       <button class="btn" onclick="closeEditOverlay()">Zrušit</button>
-      <button class="btn btn-accent" onclick="saveAndClose()">💾 Uložit</button>
+      <button class="btn btn-accent" id="saveBtn" onclick="saveAndClose()">💾 Uložit</button>
     </div>
   </div>
 </div>
