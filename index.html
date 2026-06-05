@@ -637,32 +637,235 @@ const PIN_KEY='ov_pin';const BINS_KEY='ov_bins';const LOCAL_KEY='ov_local';
 
 const DEFAULT_CATEGORIES=[
   {id:'vedeni',icon:'👑',color:'ic-a',title:'Vedení rally',hint:'Ředitel, zástupci, tajemník',keywords:'vedení ředitel zástupce tajemník štípek šefr sýkorová',
-    contacts:[{name:'Pavel Štípek',role:'Ředitel rally',phone:'720 037 750',vis:'public'},{name:'Petr Šefr',role:'Zástupce ředitele',phone:'777 140 013',vis:'public'},{name:'Václav Štípek',role:'Zástupce ředitele',phone:'',vis:'internal'},{name:'Tereza Sýkorová',role:'Tajemník rally',phone:'',vis:'internal'}],
-    info:[{label:'Ředitelství rally',text:'Cavok, Letiště Dlouhá Lhota\nGPS: 49°42\'56.682"N 14°5\'40.996"E\nTel: +420 720 037 750\ne-mail: reditelstvi@rally-pribram.cz',vis:'public'},{label:'Provozní doba',text:'23.7. 16:00–20:30\n24.7. 07:30–22:00\n25.7. 07:00–21:00',vis:'public'}]},
-  {id:'bezpecnost',icon:'🛡',color:'ic-d',title:'Bezpečnost a zdraví',hint:'Hlavní lékař, bezpečnostní činovník',keywords:'bezpečnost lékař zdraví franěk procházka švihálek záchrana 112',
-    contacts:[{name:'Jaroslav Švihálek',role:'Hlavní činovník pro bezpečnost',phone:'',vis:'internal'},{name:'MUDr. Ondřej Franěk',role:'Hlavní lékař',phone:'',vis:'internal'},{name:'MUDr. Milan Procházka',role:'Zástupce hlavního lékaře',phone:'',vis:'internal'}],
-    info:[{label:'Tísňová linka',text:'112\nČeský telefonní čas: 14112',vis:'public'},{label:'Označení bezpečnostních činovníků',text:'Vedoucí RZ – oranžová vesta "VEDOUCÍ RZ"\nVedoucí bezpečnosti – zelená vesta\nTraťoví komisaři – žlutá vesta s radiobod',vis:'public'}]},
-  {id:'technika',icon:'🔧',color:'ic-b',title:'Technická přejímka',hint:'Technický komisař, GPS/ONI systém',keywords:'technika přejímka komisař rejnart šedivý GPS ONI hlučnost homologace',
-    contacts:[{name:'Roman Rejnart',role:'Hlavní technický komisař',phone:'',vis:'public'},{name:'Václav Šedivý',role:'Hlavní technický komisař HA',phone:'',vis:'public'},{name:'Vojtěch Valenta / SAS Zlín',role:'Správce GPS ONI systému',phone:'',vis:'internal'}],
-    info:[{label:'Místo a čas technické přejímky',text:'Toyota Dolák Příbram, Evropská\n24. 7. 2026 · 14:30–19:30',vis:'public'},{label:'GPS / ONI — vrácení',text:'Tel: 722 734 127\nPoplatek: 170 Kč (ve vkladu)\nPokuta za nevrácení: 3 000 Kč',vis:'public'},{label:'Pokuta za pozdní příjezd',text:'1 000 Kč / každých 5 min\nNad 30 min → sportovní komisaři',vis:'internal'}]},
-  {id:'prihlasky',icon:'📋',color:'ic-c',title:'Přihlášky a vklady',hint:'Termíny, platby, vrácení vkladů',keywords:'přihláška vklad platba termín uzávěrka vrácení banka FIO',
-    contacts:[{name:'Ředitelství rally',role:'Dotazy k přihláškám',phone:'777 140 013',vis:'public'}],
-    info:[{label:'Klíčové termíny',text:'Zahájení příjmu: 25. 5. 2026\nUzávěrka přihlášek: 13. 7. 2026 · 20:00\nPublikace přihlášených: 16. 7. 2026',vis:'public'},{label:'Bankovní spojení',text:'FIO Banka · č.ú. 2601003927/2010\nIBAN: CZ9420100000002601003927',vis:'public'},{label:'Vrácení vkladu',text:'Před uzávěrkou: 100 %\nPřed sez. jízdami: min. 80 %\nPřed adm. přejímkou: 50 %',vis:'public'}]},
+    contacts:[
+      {name:'Pavel Štípek',role:'Ředitel rally',phone:'720 037 750',vis:'public'},
+      {name:'Petr Šefr',role:'Zástupce ředitele / Odpovědný zástupce',phone:'777 140 013',vis:'public'},
+      {name:'Václav Štípek',role:'Zástupce ředitele',phone:'',vis:'internal'},
+      {name:'Tereza Sýkorová',role:'Tajemník rally',phone:'',vis:'internal'},
+    ],
+    info:[
+      {label:'Ředitelství rally',text:'Cavok, Letiště Dlouhá Lhota\nGPS: 49°42\'56.682"N 14°5\'40.996"E\nTel: +420 720 037 750\ne-mail: reditelstvi@rally-pribram.cz',vis:'public'},
+      {label:'Provozní doba ředitelství',text:'23.7. 16:00–20:30\n24.7. 07:30–22:00\n25.7. 07:00–21:00',vis:'public'},
+    ]
+  },
+  {id:'prihlasky',icon:'📋',color:'ic-c',title:'Přihlášky a vklady',hint:'Termíny, platby, vrácení vkladů',keywords:'přihláška vklad platba termín uzávěrka vrácení banka FIO štípek šefr',
+    contacts:[
+      {name:'Pavel Štípek',role:'Technické problémy s přihláškou / zahraniční posádky / pozdní přihlášení',phone:'720 037 750',vis:'public'},
+      {name:'Petr Šefr',role:'Problémy s platbou k přihlášce',phone:'777 140 013',vis:'public'},
+    ],
+    info:[
+      {label:'Klíčové termíny',text:'Zahájení příjmu přihlášek: 25. 5. 2026\nUzávěrka přihlášek: 13. 7. 2026 · 20:00\nPublikace přihlášených: 16. 7. 2026\nPublikace itineráře a map: 19. 7. 2026',vis:'public'},
+      {label:'Přihlášení',text:'Pouze elektronicky na www.rally-pribram.cz\nPotvrzení přihlášky e-mailem',vis:'public'},
+      {label:'Bankovní spojení',text:'FIO Banka · č.ú. 2601003927/2010\nIBAN: CZ9420100000002601003927\nVS: generovaný kód z potvrzení přihlášky',vis:'public'},
+      {label:'Vrácení vkladu',text:'Před uzávěrkou: 100 %\nPřed sez. jízdami: min. 80 %\nPřed adm. přejímkou: 50 %',vis:'public'},
+      {label:'Vklady (základní)',text:'Se rek. pořadatele: 15 300 + 1 568 Kč pojistné\nBez reklamy: 30 600 + 1 568 Kč pojistné\nShakedown: 3 000 + 784 Kč',vis:'public'},
+    ]
+  },
+  {id:'adminprejimka',icon:'📝',color:'ic-c',title:'Administrativní přejímka',hint:'Dokumenty, místo, čas',keywords:'administrativa přejímka dokumenty licence pojištění Toyota Dolák hefnerová',
+    contacts:[
+      {name:'Sára Hefnerová',role:'Činovník pro styk se soutěžícími',phone:'737 202 809',vis:'public'},
+    ],
+    info:[
+      {label:'Místo a čas',text:'Toyota Dolák Příbram, Evropská\n24. 7. 2026 · 14:00–18:30',vis:'public'},
+      {label:'Dokumenty k předložení',text:'Řidičské průkazy jezdce a spolujezdce (originál)\nDoklad o zákonném pojištění vozidla (Zelená karta)\nDoklady o registraci vozidla\nSouhlas majitele vozidla (pokud není v posádce)\nZahraniční posádky: licence + povolení ASN',vis:'public'},
+      {label:'Co dostanete při přejímce',text:'Itinerář a dokumentace\nOznačení pro soutěžní vozidlo\nOznačení pro servisní vozidla\nQR kód pro přihlášení do Sportity',vis:'public'},
+    ]
+  },
+  {id:'techprejimka',icon:'🔧',color:'ic-b',title:'Technická přejímka',hint:'Technický komisař, GPS/ONI systém',keywords:'technika přejímka komisař rejnart šedivý GPS ONI hlučnost homologace',
+    contacts:[
+      {name:'Roman Rejnart',role:'Hlavní technický komisař — problémy s přejímkou, opravy, dokumenty',phone:'',vis:'public'},
+      {name:'Václav Šedivý',role:'Hlavní technický komisař HA',phone:'',vis:'public'},
+      {name:'Vojtěch Valenta / SAS Zlín',role:'Správce GPS ONI systému',phone:'',vis:'internal'},
+    ],
+    info:[
+      {label:'Místo a čas technické přejímky',text:'Toyota Dolák Příbram, Evropská\n24. 7. 2026 · 14:30–19:30\nČas přejímky = v potvrzení přihlášky + na webu',vis:'public'},
+      {label:'Dokumenty k předložení',text:'Homologační list vozidla\nCedule SOS/OK (formát A3)\nVyplněná technická karta s bezpečnostní výbavou\nKompletní oblečení, přilby, systém FHR (HANS)',vis:'public'},
+      {label:'GPS / ONI — vydání a vrácení',text:'Vydání: před technickou přejímkou u Toyota Dolák\nVrácení: po rally — Tel: 722 734 127\nPoplatek za jednotku: 170 Kč (ve vkladu)\nPokuta za nevrácení: 3 000 Kč',vis:'public'},
+      {label:'Pokuta za pozdní příjezd',text:'1 000 Kč / každých 5 min zpoždění\nNad 30 min → sportovní komisaři',vis:'internal'},
+      {label:'Hlučnost vozidel',text:'Max. 96 dB(A) statickou metodou\nPřekročení při přejímce = odmítnutí startu',vis:'public'},
+    ]
+  },
+  {id:'bezpecnost',icon:'🛡',color:'ic-d',title:'Bezpečnost a zdraví',hint:'Hlavní lékař, záchranné složky, dispečink',keywords:'bezpečnost lékař zdraví franěk procházka švihálek záchrana 112 dispečink',
+    contacts:[
+      {name:'Jaroslav Švihálek',role:'Hlavní činovník pro bezpečnost',phone:'',vis:'public'},
+      {name:'MUDr. Ondřej Franěk',role:'Hlavní lékař — dostupný po celou dobu rally',phone:'',vis:'public'},
+      {name:'MUDr. Milan Procházka',role:'Zástupce hlavního lékaře',phone:'',vis:'internal'},
+      {name:'Miroslav Žitník',role:'Vedoucí dispečinku — koordinace záchranných složek a krizových situací (pouze pro OV)',phone:'602 303 141',vis:'internal'},
+    ],
+    info:[
+      {label:'Tísňová linka',text:'112',vis:'public'},
+      {label:'Záchranná služba na trati',text:'Záchranná služba je na startu každé rychlostní zkoušky po celou dobu jejího konání',vis:'public'},
+      {label:'Krizové situace na trati',text:'Veškeré problémy na trati koordinuje dispečink\nDispečink určuje postupy při nehodách a krizových situacích\nKontakt na dispečink je pouze pro členy OV a pořadatele',vis:'public'},
+      {label:'Označení bezpečnostních činovníků',text:'Vedoucí RZ – oranžová vesta "VEDOUCÍ RZ"\nVedoucí bezpečnosti RZ – zelená vesta\nTraťoví komisaři – žlutá vesta s radiobod\nOstatní pořadatelé – oranžová vesta',vis:'public'},
+    ]
+  },
   {id:'soutezici',icon:'🏁',color:'ic-e',title:'Styk se soutěžícími',hint:'Činovník pro styk — Sára Hefnerová',keywords:'soutěžící jezdci posádky hefnerová styk dotazy sportity',
-    contacts:[{name:'Sára Hefnerová',role:'Činovník pro styk se soutěžícími',phone:'737 202 809',vis:'public'}],
-    info:[{label:'Sportity — elektronická vývěska',text:'webapp.sportity.com/channel/pribram2026\nHeslo: Pribram2026',vis:'public'},{label:'Administrativní přejímka',text:'Toyota Dolák Příbram\n24. 7. 2026 · 14:00–18:30',vis:'public'}]},
-  {id:'casomeric',icon:'⏱',color:'ic-f',title:'Časoměření a výsledky',hint:'Hlavní časoměřič, výsledky',keywords:'čas časoměření výsledky klasifikace just šperka RE-CO',
-    contacts:[{name:'Ladislav Just',role:'Hlavní časoměřič',phone:'',vis:'internal'},{name:'Ing. Lubomír Šperka / RE-CO',role:'Zpracovatelská skupina',phone:'',vis:'internal'}],
-    info:[{label:'Výsledky — publikace',text:'Startovní listina: 24. 7. · 21:30\nPředběžná klasifikace: 25. 7. · 19:30\nKonečná: po uplynutí protestní doby',vis:'public'},{label:'Kde hledat',text:'www.rally-pribram.cz (DNB)\nAplikace SPORTITY',vis:'public'}]},
-  {id:'servis',icon:'🚗',color:'ic-d',title:'Servisní zóna a trať',hint:'Letiště Dlouhá Lhota, RZ, tankování',keywords:'servis servisní zóna letiště trať RZ rychlostní zkouška tankování Sedlčany',
-    contacts:[{name:'Miroslav Žitník',role:'Vedoucí dispečinku',phone:'',vis:'internal'},{name:'Zbyněk Stach',role:'Činovník pro životní prostředí',phone:'',vis:'internal'}],
-    info:[{label:'Servisní zóna',text:'Letiště Dlouhá Lhota\nGPS: 49°42\'56.682"N 14°5\'40.996"E\nPá 24. 7. 10:00–21:00 · So 25. 7. od 06:30',vis:'public'},{label:'Start rally',text:'Náměstí T. G. Masaryka, Příbram\n25. 7. 2026 · 09:00\nCílový ceremoniál: 17:30',vis:'public'},{label:'Pokuta — servisní zóna',text:'10 000 Kč za nedodržení vstupních časů\nV servisní době: zákaz pohybu servisních aut',vis:'internal'},{label:'Vzdálená tankovací zóna',text:'Sedlčany · GPS: 49°39\'13.354"N, 14°26\'16.052"E\n25. 7. 10:15–17:15',vis:'public'}]},
-  {id:'tisk',icon:'📰',color:'ic-b',title:'Tisk a média',hint:'Tisková střediska, akreditace',keywords:'tisk média novináři tisková střediska šefrová barbora eliáš akreditace',
-    contacts:[{name:'Barbora Šefrová',role:'Hlavní činovník pro tisk',phone:'',vis:'internal'},{name:'Radovan Eliáš',role:'Media delegát AS AČR',phone:'',vis:'public'}],
-    info:[{label:'Tiskové středisko',text:'MKC Příbram, Špitálská 18 (Špalíček)\nGPS: N 49°41.22523\', E 14°0.51205\'\n24. 7.: 14:30–21:00\n25. 7.: 07:30–10:30 a 14:00–20:00',vis:'public'}]},
+    contacts:[
+      {name:'Sára Hefnerová',role:'Činovník pro styk se soutěžícími',phone:'737 202 809',vis:'public'},
+    ],
+    info:[
+      {label:'Sportity — elektronická vývěska',text:'webapp.sportity.com/channel/pribram2026\nHeslo: Pribram2026\nApp zdarma: Google Play / App Store',vis:'public'},
+      {label:'Kde hledat výsledky a dokumenty',text:'www.rally-pribram.cz (digitální nástěnka)\nAplikace SPORTITY',vis:'public'},
+    ]
+  },
+  {id:'servis',icon:'🚗',color:'ic-d',title:'Servisní zóna a trať',hint:'Letiště Dlouhá Lhota, RZ, tankování',keywords:'servis servisní zóna letiště trať RZ rychlostní zkouška tankování Sedlčany stach štípek',
+    contacts:[
+      {name:'Pavel Štípek',role:'Přidělování míst v servisní zóně, speciální požadavky',phone:'720 037 750',vis:'public'},
+      {name:'Zbyněk Stach',role:'Hlídání vjezdu do servisní zóny, porušení pravidel, odpad v servisu',phone:'',vis:'public'},
+    ],
+    info:[
+      {label:'Servisní zóna',text:'Letiště Dlouhá Lhota\nGPS: 49°42\'56.682"N 14°5\'40.996"E\nPá 24. 7. 10:00–21:00 · So 25. 7. od 06:30',vis:'public'},
+      {label:'Vjezd do servisní zóny',text:'Pouze vozidla s označením SERVIS, SOUTĚŽNÍ VOZIDLO nebo SEZNAMOVACÍ VOZIDLO\nMapa rozmístění a vjezdu = součást itineráře',vis:'public'},
+      {label:'Přidělený prostor',text:'Prioritní jezdci FIA/ASN: 100 m²\nOstatní posádky: 80 m²\nExtra prostor: 150 Kč/m² (max. 150 m²) — objednat s přihláškou',vis:'public'},
+      {label:'Mapa servisní zóny',text:'Posádky obdrží mapu v tašce při administrativní přejímce',vis:'public'},
+      {label:'Pokuta — porušení servisní zóny',text:'10 000 Kč za nedodržení vstupních časů\nV době servisu: zákaz pohybu servisních vozidel = 2 000 Kč',vis:'internal'},
+      {label:'Start rally',text:'Náměstí T. G. Masaryka, Příbram\n25. 7. 2026 · 09:00\nCílový ceremoniál: 17:30',vis:'public'},
+      {label:'Vzdálená tankovací zóna',text:'Sedlčany · GPS: 49°39\'13.354"N, 14°26\'16.052"E\n25. 7. 2026 · 10:15–17:15',vis:'public'},
+    ]
+  },
+  {id:'tratove',icon:'🚧',color:'ic-f',title:'Traťoví komisaři a pořadatelé',hint:'Nábor, koordinace, označení',keywords:'traťoví komisaři pořadatelé dobrovolníci sladovník nábor vesta visačka RZ',
+    contacts:[
+      {name:'Václav Sladovník',role:'Koordinátor traťových komisařů a pořadatelů, nábor',phone:'',vis:'public'},
+    ],
+    info:[
+      {label:'Označení pořadatelů',text:'Visačka + vesta (ne dobrovolníci — říkáme jim Traťoví komisaři / Pořadatelé)',vis:'public'},
+      {label:'Organizace na RZ',text:'Briefing a přidělení stanovišť řeší každý Vedoucí RZ samostatně',vis:'public'},
+      {label:'Náhradníci',text:'Případné náhradníky řeší Vedoucí RZ samostatně',vis:'public'},
+      {label:'Nábor pořadatelů',text:'Přihlásit se lze přes formulář na www.rallypribram.cz',vis:'public'},
+    ]
+  },
+  {id:'casomeric',icon:'⏱',color:'ic-f',title:'Časoměření a výsledky',hint:'Hlavní časoměřič, výsledky, klasifikace',keywords:'čas časoměření výsledky klasifikace just šperka RE-CO startovní listina',
+    contacts:[
+      {name:'Ladislav Just',role:'Hlavní časoměřič',phone:'',vis:'internal'},
+      {name:'Ing. Lubomír Šperka / RE-CO',role:'Zpracovatelská skupina výsledků',phone:'',vis:'internal'},
+    ],
+    info:[
+      {label:'Výsledky — publikace',text:'Startovní listina: 24. 7. · 21:30\nPředběžná klasifikace: 25. 7. · 19:30\nKonečná: po uplynutí protestní doby',vis:'public'},
+      {label:'Kde hledat',text:'www.rally-pribram.cz (DNB)\nAplikace SPORTITY',vis:'public'},
+    ]
+  },
   {id:'komisari',icon:'⚖️',color:'ic-a',title:'Sportovní komisaři',hint:'Protesty, penalizace, pravidla',keywords:'komisař protest penalizace pravidla nejdl bělák mynářová panušková',
-    contacts:[{name:'Jiří Nejdl',role:'Hlavní sportovní komisař',phone:'',vis:'public'},{name:'Zdeněk Bělák',role:'Sportovní komisař',phone:'',vis:'public'},{name:'Petra Mynářová',role:'Sportovní komisař',phone:'',vis:'public'},{name:'Kristýna Panušková',role:'Sekretář SSK',phone:'',vis:'internal'}],
-    info:[{label:'Poplatky při protestu',text:'Protest: 15 000 Kč\nOdvolání (ASN): 30 000 Kč',vis:'public'},{label:'Vybrané sankce',text:'Retardér (posunutí): +30 sek\nPozdní příjezd na přejímku: 1 000 Kč / 5 min',vis:'internal'}]},
+    contacts:[
+      {name:'Jiří Nejdl',role:'Hlavní sportovní komisař',phone:'',vis:'public'},
+      {name:'Zdeněk Bělák',role:'Sportovní komisař',phone:'',vis:'public'},
+      {name:'Petra Mynářová',role:'Sportovní komisař',phone:'',vis:'public'},
+      {name:'Kristýna Panušková',role:'Sekretář SSK',phone:'',vis:'internal'},
+    ],
+    info:[
+      {label:'Poplatky při protestu',text:'Protest: 15 000 Kč\nOdvolání (ASN): 30 000 Kč',vis:'public'},
+      {label:'Vybrané sankce',text:'Retardér (posunutí): +30 sek\nPozdní příjezd na přejímku: 1 000 Kč / 5 min\nNedodržení pravidel tankování: dle komisařů',vis:'internal'},
+      {label:'Delegáti',text:'Sportovní delegát AS AČR: Linhart Petr\nBezpečnostní delegát AS AČR: Smolík Miroslav\nMedia delegát AS AČR: Eliáš Radovan',vis:'public'},
+    ]
+  },
+  {id:'program',icon:'📅',color:'ic-b',title:'Program a harmonogram',hint:'Slavnostní show, cíl, předání cen',keywords:'program harmonogram show náměstí představení cílový ceremoniál ceny kostík ausperger',
+    contacts:[
+      {name:'Roman Kostík',role:'Organizace slavnostního představení posádek a náměstí TGM',phone:'',vis:'public'},
+      {name:'Pavel Ausperger',role:'Předání a evidence pohárů',phone:'',vis:'internal'},
+    ],
+    info:[
+      {label:'Slavnostní představení posádek',text:'Náměstí T. G. Masaryka, Příbram\n24. 7. 2026 · 19:00–21:00\nÚčastní se pouze posádky s pozvánkou',vis:'public'},
+      {label:'Start rally',text:'Náměstí T. G. Masaryka\n25. 7. 2026 · 09:00',vis:'public'},
+      {label:'Cílový ceremoniál a předání cen',text:'Náměstí T. G. Masaryka\n25. 7. 2026 · 17:30\nPředávají: Pavel Štípek, Petr Šefr + zástupci města a kraje',vis:'public'},
+      {label:'Prodej programu',text:'V tiskové formě na náměstí při předstartovní show 24. 7.',vis:'public'},
+    ]
+  },
+  {id:'stanky',icon:'🍔',color:'ic-c',title:'Prodejní stánky',hint:'Jídlo, pití a prodej na akci',keywords:'stánky prodej jídlo pití náměstí RZ kostík šefrová šárka',
+    contacts:[
+      {name:'Roman Kostík',role:'Prodejní stánky na Náměstí TGM — přidělení míst, organizace',phone:'',vis:'public'},
+      {name:'Šárka Šefrová',role:'Prodejní stánky na rychlostních zkouškách — přidělení míst, organizace',phone:'',vis:'public'},
+    ],
+    info:[
+      {label:'Chcete prodávat na rally?',text:'Náměstí TGM: kontaktujte Roman Kostík\nRychlostní zkoušky: kontaktujte Šárka Šefrová',vis:'public'},
+    ]
+  },
+  {id:'divaci',icon:'👥',color:'ic-c',title:'Divácké informace',hint:'Vstupné, parkování, místa, mapy',keywords:'diváci vstupné parkování místa mapy RZ bezpečnost páska pořadatel',
+    contacts:[],
+    info:[
+      {label:'Vstupné',text:'200 Kč / auto\nJedna vstupenka platí na všech vybraných místech\nProdej přímo na vybraných stanovištích',vis:'public'},
+      {label:'Divácká místa',text:'Divácká místa jsou vyznačena páskou\nVždy se řiďte pokyny pořadatelů na dané RZ\nVstup na trať je přísně zakázán',vis:'public'},
+      {label:'Parkování pro diváky',text:'Organizované parkování u RZ není zajištěno\nVIP hosté obdrží info o parkování ve svém balíčku',vis:'public'},
+      {label:'Kde najít program a mapy',text:'Web: www.rallypribram.cz\nSociální sítě: TikTok, Instagram, Facebook\nAplikace SPORTITY\nInteraktivní mapy RZ budou zveřejněny 19. 7. 2026 na webu a sociálních sítích',vis:'public'},
+      {label:'Informace o změnách',text:'Sledujte sociální sítě, web a aplikaci SPORTITY',vis:'public'},
+    ]
+  },
+  {id:'merch',icon:'🛍',color:'ic-c',title:'Prodej merchandisingu',hint:'Kde a kdy koupit rally merch',keywords:'merch merchandise eshop shop prodej tričko náměstí Drevníky',
+    contacts:[],
+    info:[
+      {label:'Kde koupit',text:'Online eshop: www.rallypribram.cz (pár týdnů před rally)\nNáměstí TGM — při předstartovní show 24. 7. 2026\nDivácké místo Drevníky — po dobu konání rally',vis:'public'},
+      {label:'Upozornění',text:'Po dobu konání rally (25. 7.) nebude eshop funkční',vis:'public'},
+    ]
+  },
+  {id:'vip',icon:'⭐',color:'ic-a',title:'VIP a hosté',hint:'VIP zóny, pozvánky, Šárka Šefrová',keywords:'VIP hosté pozvánka zóna šefrová šárka parkování balíček',
+    contacts:[
+      {name:'Šárka Šefrová',role:'Koordinátorka VIP hostů — pozvánky, parkování, program, péče o hosty',phone:'',vis:'public'},
+    ],
+    info:[
+      {label:'VIP zóny',text:'Náměstí T. G. Masaryka, Příbram\nObec Drevníky (divácké místo)',vis:'public'},
+      {label:'Jak se stát VIP hostem',text:'Pouze na pozvání — nelze koupit\nMožnost vyhrát pozvání (sledujte sociální sítě)',vis:'public'},
+      {label:'VIP balíček zahrnuje',text:'Info o parkování\nDetailní program\nOznačení vozidla',vis:'public'},
+    ]
+  },
+  {id:'tisk',icon:'📰',color:'ic-b',title:'Tisk a média',hint:'Tiskové středisko, akreditace, sociální sítě',keywords:'tisk média novináři tisková střediska šefrová barbora eliáš akreditace sociální sítě',
+    contacts:[
+      {name:'Barbora Šefrová',role:'Hlavní činovník pro tisk, web a sociální sítě',phone:'',vis:'internal'},
+      {name:'Radovan Eliáš',role:'Media delegát AS AČR',phone:'',vis:'public'},
+      {name:'Petr Eliáš',role:'Livestream a video obsah na vlastních sociálních sítích',phone:'',vis:'public'},
+    ],
+    info:[
+      {label:'Tiskové středisko',text:'MKC Příbram, Špitálská 18 (Špalíček)\nGPS: N 49°41.22523\', E 14°0.51205\'\n24. 7.: 14:30–21:00\n25. 7.: 07:30–10:30 a 14:00–20:00',vis:'public'},
+      {label:'Tiskový balíček pro média',text:'K dispozici v Tiskovém středisku\nObsahuje: nálepku na auto, reklamní předměty, program',vis:'public'},
+      {label:'Akreditace pro média',text:'Přihlášení předem přes odkaz Autoklubu ČR\n(odkaz bude upřesněn)',vis:'public'},
+      {label:'Sociální sítě rally',text:'TikTok, Instagram, Facebook\nwww.rallypribram.cz',vis:'public'},
+    ]
+  },
+  {id:'sponzori',icon:'🤝',color:'ic-b',title:'Sponzoři a partneři',hint:'Smlouvy, bannery, označení aut',keywords:'sponzor partner smlouva banner označení sochor baštecký šefr',
+    contacts:[
+      {name:'Petr Šefr',role:'Sponzorské smlouvy a partnerství',phone:'777 140 013',vis:'public'},
+      {name:'Martin Sochor',role:'Rozmístění a správa bannerů sponzorů',phone:'',vis:'public'},
+      {name:'Radek Baštecký',role:'Označení OBK vozidel reklamou',phone:'',vis:'public'},
+      {name:'Šárka Šefrová',role:'Péče o sponzory a partnery během rally',phone:'',vis:'public'},
+    ],
+    info:[
+      {label:'VIP pro sponzory',text:'Zajišťuje Šárka Šefrová — pozvání, program, zázemí',vis:'public'},
+    ]
+  },
+  {id:'obk',icon:'🚙',color:'ic-f',title:'OBK vozidla',hint:'Půjčení vozidel, tankování OBK',keywords:'OBK vozidla baštecký radek půjčení tankování sponzoři',
+    contacts:[
+      {name:'Radek Baštecký',role:'Vše ohledně OBK vozidel — půjčení od sponzorů, tankování, označení',phone:'',vis:'public'},
+    ],
+    info:[]
+  },
+  {id:'mtz',icon:'🏗',color:'ic-d',title:'MTZ — Materiální zabezpečení',hint:'Vybavení, značení, infrastruktura',keywords:'MTZ materiální zabezpečení baštecký david vybavení infrastruktura stany značení',
+    contacts:[
+      {name:'David Baštecký',role:'MTZ — veškeré materiální zabezpečení (RZ, náměstí, tiskové středisko, servis, ředitelství)',phone:'',vis:'internal'},
+    ],
+    info:[
+      {label:'Co MTZ zajišťuje',text:'Vybavení a infrastruktura pro:\n• Rychlostní zkoušky\n• Náměstí TGM\n• Tiskové středisko\n• Servisní zóna\n• Ředitelství rally\nOdvoz materiálu z RZ po skončení rally',vis:'internal'},
+      {label:'Označení tratě',text:'MTZ dodává materiál (pásky, značky, šipky)\nUmístění zajišťuje Vedoucí dané RZ',vis:'public'},
+    ]
+  },
+  {id:'finance',icon:'💰',color:'ic-a',title:'Finance a fakturace',hint:'Platby, faktury, vyúčtování',keywords:'finance faktura platba vyúčtování šefr petr',
+    contacts:[
+      {name:'Petr Šefr',role:'Faktury, platby od týmů, vrácení vkladů, problém s platbou',phone:'777 140 013',vis:'public'},
+    ],
+    info:[
+      {label:'Problém s platbou',text:'Špatný variabilní symbol, pozdní platba, neobdržení potvrzení:\nKontaktujte Petr Šefr: 777 140 013',vis:'public'},
+      {label:'Schvalování výdajů během rally',text:'Veškeré výdaje schvaluje Petr Šefr',vis:'internal'},
+      {label:'Vyúčtování po rally',text:'Zajišťuje Petr Šefr',vis:'internal'},
+    ]
+  },
+  {id:'tiskoviny',icon:'🖨',color:'ic-e',title:'Tiskoviny a označení',hint:'Cedulky, kartičky, tiskoviny',keywords:'tiskoviny označení cedulky kartičky šefrová šárka',
+    contacts:[
+      {name:'Šárka Šefrová',role:'Vše ohledně tiskovin, cedulek, kartiček a podobných materiálů',phone:'',vis:'internal'},
+    ],
+    info:[]
+  },
+  {id:'ubytovani',icon:'🏨',color:'ic-b',title:'Ubytování komisařů a delegátů',hint:'Zajišťuje OV',keywords:'ubytování hotel komisař delegát',
+    contacts:[],
+    info:[
+      {label:'Ubytování',text:'Ubytování sportovních komisařů a delegátů zajišťuje organizační výbor',vis:'internal'},
+    ]
+  },
 ];
 
 let categories=[];let editBuffer=null;let selectedEditCatId=null;let activeCatId=null;let pinBuffer='';let isInternal=false;
