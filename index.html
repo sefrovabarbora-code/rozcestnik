@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OV Rozcestník · 45. SILMET Rally Příbram 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root {
+  --bg: #0f0f0f;
+  --bg2: #1a1a1a;
+  --bg3: #222;
+  --border: rgba(255,255,255,0.08);
+  --border2: rgba(255,255,255,0.15);
+  --text: #f0f0f0;
+  --text2: #999;
+  --text3: #666;
+  --accent: #f0c040;
+  --accent2: rgba(240,192,64,0.12);
+  --accent3: rgba(240,192,64,0.06);
+  --danger: #e55;
+  --success: #4c9;
+  --radius: 10px;
+  --radius-sm: 6px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Barlow', sans-serif;
+  font-size: 15px;
+  min-height: 100vh;
+}
+.top-bar {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.top-bar-left h1 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+.top-bar-left p {
+  font-size: 12px;
+  color: var(--text3);
+  margin-top: 2px;
+  font-family: 'Barlow Condensed', sans-serif;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.top-bar-right { display: flex; gap: 8px; align-items: center; }
+.btn {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 7px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border2);
+  background: transparent;
+  color: var(--text2);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s;
+}
+.btn:hover { background: var(--bg3); color: var(--text); border-color: var(--border2); }
+.btn-accent { background: var(--accent); color: #000; border-color: var(--accent); }
+.btn-accent:hover { background: #ffd050; color: #000; border-color: #ffd050; }
+.btn-danger { border-color: var(--danger); color: var(--danger); }
+.btn-danger:hover { background: rgba(238,85,85,0.1); }
+.btn-sm { padding: 5px 10px; font-size: 12px; }
+
+.container { max-width: 900px; margin: 0 auto; padding: 20px 16px 60px; }
+
+.search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 16px;
+  margin-bottom: 20px;
+  transition: border-color 0.15s;
+}
+.search-wrap:focus-within { border-color: var(--border2); }
+.search-icon { color: var(--text3); font-size: 16px; }
+.search-wrap input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-family: 'Barlow', sans-serif;
+  font-size: 15px;
+  width: 100%;
+}
+.search-wrap input::placeholder { color: var(--text3); }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+}
+.bubble {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+}
+.bubble:hover { border-color: var(--border2); background: var(--bg3); }
+.bubble.active { border-color: var(--accent); background: var(--accent3); }
+.bubble-icon {
+  width: 38px; height: 38px;
+  border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+.bubble-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.bubble-hint { font-size: 12px; color: var(--text3); line-height: 1.4; }
+.bubble-count {
+  position: absolute;
+  top: 10px; right: 10px;
+  font-size: 11px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 600;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 2px 8px;
+  color: var(--text3);
+}
+.bubble.active .bubble-count { background: var(--accent2); border-color: var(--accent); color: var(--accent); }
+
+.detail-panel {
+  display: none;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-top: 12px;
+  overflow: hidden;
+}
+.detail-panel.show { display: block; }
+.detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.detail-header h2 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+.detail-body { padding: 16px 20px; }
+
+.section-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 10px;
+  margin-top: 16px;
+}
+.section-label:first-child { margin-top: 0; }
+
+.contacts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px; }
+.contact-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.contact-av {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.contact-info { flex: 1; min-width: 0; }
+.contact-name { font-size: 14px; font-weight: 500; color: var(--text); }
+.contact-role { font-size: 11px; color: var(--text3); margin-top: 2px; line-height: 1.3; }
+.contact-phone {
+  margin-top: 6px;
+  font-size: 14px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 600;
+  color: var(--accent);
+  display: flex; align-items: center; gap: 6px;
+  text-decoration: none;
+}
+.contact-phone:hover { text-decoration: underline; }
+
+.info-blocks { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; }
+.info-block {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+}
+.info-block-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+.info-block p { font-size: 13px; color: var(--text2); line-height: 1.65; }
+
+.no-results {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text3);
+  font-size: 14px;
+}
+
+/* ── EDIT MODE ── */
+.edit-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  z-index: 200;
+  overflow-y: auto;
+  padding: 20px;
+}
+.edit-overlay.show { display: flex; flex-direction: column; align-items: center; }
+.edit-modal {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  width: 100%;
+  max-width: 700px;
+  margin: auto;
+}
+.edit-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.edit-modal-header h2 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.edit-modal-body { padding: 20px; }
+.field-group { margin-bottom: 16px; }
+.field-group label {
+  display: block;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 6px;
+}
+.field-group input, .field-group textarea, .field-group select {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: 'Barlow', sans-serif;
+  font-size: 14px;
+  padding: 9px 12px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.field-group input:focus, .field-group textarea:focus { border-color: var(--accent); }
+.field-group textarea { resize: vertical; min-height: 80px; }
+
+.contacts-editor { margin-bottom: 16px; }
+.contact-edit-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto auto;
+  gap: 8px;
+  margin-bottom: 8px;
+  align-items: center;
+}
+.contact-edit-row input {
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: 'Barlow', sans-serif;
+  font-size: 13px;
+  padding: 7px 10px;
+  outline: none;
+}
+.contact-edit-row input:focus { border-color: var(--accent); }
+.del-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text3);
+  cursor: pointer;
+  padding: 7px 10px;
+  font-size: 14px;
+  transition: all 0.15s;
+  line-height: 1;
+}
+.del-btn:hover { border-color: var(--danger); color: var(--danger); }
+
+.info-editor { margin-bottom: 16px; }
+.info-edit-row { margin-bottom: 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px; display: flex; flex-direction: column; gap: 6px; position: relative; }
+.info-edit-row .del-btn { position: absolute; top: 8px; right: 8px; }
+.tabs { display: flex; gap: 6px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+.tab-btn {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text3);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.tab-btn:hover { color: var(--text); }
+.tab-btn.active { background: var(--accent2); border-color: var(--accent); color: var(--accent); }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* PIN overlay */
+.pin-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.9);
+  z-index: 300;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+.pin-overlay.show { display: flex; }
+.pin-box {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  padding: 32px;
+  width: 280px;
+  text-align: center;
+}
+.pin-box h3 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+.pin-box p { font-size: 13px; color: var(--text3); margin-bottom: 20px; }
+.pin-dots { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+.pin-dot {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--border2);
+  background: transparent;
+  transition: all 0.1s;
+}
+.pin-dot.filled { background: var(--accent); border-color: var(--accent); }
+.pin-numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.pin-key {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  padding: 14px;
+  cursor: pointer;
+  transition: all 0.1s;
+}
+.pin-key:hover { background: var(--border); }
+.pin-key:active { transform: scale(0.95); }
+.pin-error { color: var(--danger); font-size: 13px; margin-top: 10px; min-height: 18px; }
+.pin-cancel { margin-top: 14px; background: transparent; border: none; color: var(--text3); font-size: 13px; cursor: pointer; }
+.pin-cancel:hover { color: var(--text); }
+
+/* Category editor */
+.cat-list { margin-bottom: 16px; }
+.cat-edit-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: 6px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.cat-edit-item:hover { border-color: var(--border2); }
+.cat-edit-item.selected { border-color: var(--accent); }
+.cat-edit-icon { font-size: 20px; }
+.cat-edit-info { flex: 1; }
+.cat-edit-name { font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 600; text-transform: uppercase; }
+.cat-edit-count { font-size: 12px; color: var(--text3); }
+
+/* badge colours */
+.av-a { background: rgba(240,192,64,0.15); color: #f0c040; }
+.av-b { background: rgba(64,160,240,0.15); color: #40a0f0; }
+.av-c { background: rgba(64,210,140,0.15); color: #40d28c; }
+.av-d { background: rgba(240,100,80,0.15); color: #f06450; }
+.av-e { background: rgba(180,100,240,0.15); color: #b464f0; }
+.av-f { background: rgba(80,200,100,0.15); color: #50c864; }
+.ic-a { background: rgba(240,192,64,0.12); color: #f0c040; }
+.ic-b { background: rgba(64,160,240,0.12); color: #40a0f0; }
+.ic-c { background: rgba(64,210,140,0.12); color: #40d28c; }
+.ic-d { background: rgba(240,100,80,0.12); color: #f06450; }
+.ic-e { background: rgba(180,100,240,0.12); color: #b464f0; }
+.ic-f { background: rgba(80,200,100,0.12); color: #50c864; }
+
+@media (max-width: 540px) {
+  .top-bar { flex-wrap: wrap; gap: 10px; }
+  .grid { grid-template-columns: repeat(2, 1fr); }
+  .contact-edit-row { grid-template-columns: 1fr 1fr; }
+  .contact-edit-row input:nth-child(3) { grid-column: 1 / -1; }
+}
+
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--color-text-tertiary);flex-shrink:0;transition:background 0.3s}
+.sync-dot.ok{background:#40c878}
+.sync-dot.err{background:#e05555}
+.sync-dot.loading{background:#f0c040;animation:sdpulse 1s infinite}
+@keyframes sdpulse{0%,100%{opacity:1}50%{opacity:0.3}}
+.mode-badge{font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px;border:0.5px solid}
+.mode-badge.public{background:rgba(64,200,120,0.1);color:#2a9d5c;border-color:rgba(64,200,120,0.3)}
+.mode-badge.internal{background:rgba(240,192,64,0.1);color:#b07d10;border-color:rgba(240,192,64,0.3)}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div id="syncBar" style="display:flex;align-items:center;gap:8px;padding:7px 20px;font-size:12px;color:var(--color-text-secondary);border-bottom:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary)">
+  <div id="syncDot" class="sync-dot"></div>
+  <span id="syncText">Inicializace…</span>
+</div>
+<div class="top-bar">
+  <div class="top-bar-left">
+    <h1>Rally Příbram 2026</h1>
+    <p>Interní rozcestník OV · 45. SILMET</p>
+  </div>
+  <div class="top-bar-right">
+    <button class="btn btn-sm" onclick="exportExcel()" title="Export do Excelu">⬇ Excel</button>
+    <label class="btn btn-sm" title="Import z Excelu" style="cursor:pointer">
+      ⬆ Import <input type="file" accept=".xlsx,.xls" style="display:none" onchange="importExcel(event)">
+    </label>
+    <button class="btn btn-sm btn-accent" onclick="handleMainBtn()" id="editBtn">✎ Upravit</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="container">
+  <div class="search-wrap">
+    <span class="search-icon">⌕</span>
+    <input type="text" id="searchInput" placeholder="Hledat jméno, roli, telefon, téma…" oninput="filterBubbles()">
+  </div>
+  <div class="grid" id="grid"></div>
+  <div id="detail" class="detail-panel"></div>
+  <div id="noResults" class="no-results" style="display:none">Žádné výsledky</div>
+</div>
+
+<!-- PIN OVERLAY -->
+<div class="pin-overlay" id="pinOverlay">
+  <div class="pin-box">
+    <h3>🔒 Interní přístup</h3>
+    <p>Zadejte PIN pro zobrazení interních dat a editaci</p>
+    <div class="pin-dots" id="pinDots">
+      <div class="pin-dot" id="d0"></div>
+      <div class="pin-dot" id="d1"></div>
+      <div class="pin-dot" id="d2"></div>
+      <div class="pin-dot" id="d3"></div>
+    </div>
+    <div class="pin-numpad">
+      <button class="pin-key" onclick="pinKey('1')">1</button>
+      <button class="pin-key" onclick="pinKey('2')">2</button>
+      <button class="pin-key" onclick="pinKey('3')">3</button>
+      <button class="pin-key" onclick="pinKey('4')">4</button>
+      <button class="pin-key" onclick="pinKey('5')">5</button>
+      <button class="pin-key" onclick="pinKey('6')">6</button>
+      <button class="pin-key" onclick="pinKey('7')">7</button>
+      <button class="pin-key" onclick="pinKey('8')">8</button>
+      <button class="pin-key" onclick="pinKey('9')">9</button>
+      <button class="pin-key" onclick="pinKey('del')" style="font-size:14px">⌫</button>
+      <button class="pin-key" onclick="pinKey('0')">0</button>
+      <button class="pin-key" onclick="pinKey('del')" style="font-size:14px; opacity:0; pointer-events:none"></button>
+    </div>
+    <div class="pin-error" id="pinError"></div>
+    <button class="pin-cancel" onclick="closePinOverlay()">Zrušit</button>
+  </div>
+</div>
+
+<!-- EDIT OVERLAY -->
+<div class="edit-overlay" id="editOverlay">
+  <div class="edit-modal">
+    <div class="edit-modal-header">
+      <h2 id="editModalTitle">Upravit kategorii</h2>
+      <button class="btn btn-sm" onclick="closeEditOverlay()">✕ Zavřít</button>
+    </div>
+    <div class="edit-modal-body">
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('cats')">Kategorie</button>
+        <button class="tab-btn" onclick="switchTab('contacts')">Kontakty</button>
+        <button class="tab-btn" onclick="switchTab('info')">Informace</button>
+        <button class="tab-btn" onclick="switchTab('settings')">Nastavení</button>
+      </div>
+
+      <!-- TAB: KATEGORIE -->
+      <div class="tab-content active" id="tab-cats">
+        <p style="font-size:13px;color:var(--text3);margin-bottom:12px">Vyberte kategorii pro editaci kontaktů a informací:</p>
+        <div class="cat-list" id="catList"></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn" onclick="addCategory()">+ Přidat kategorii</button>
+          <button class="btn btn-danger btn-sm" id="delCatBtn" onclick="deleteSelectedCategory()" style="display:none">✕ Smazat vybranou</button>
+        </div>
+      </div>
+
+      <!-- TAB: KONTAKTY -->
+      <div class="tab-content" id="tab-contacts">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+          <p style="font-size:13px;color:var(--color-text-secondary)">Kontakty: <strong id="editingCatName">—</strong></p>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <span class="vis-tag public" style="font-size:11px;padding:2px 8px">Veřejné = vidí všichni</span>
+            <span class="vis-tag internal" style="font-size:11px;padding:2px 8px">Interní = jen OV</span>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 120px 90px 32px;gap:6px;margin-bottom:6px">
+          <span style="font-size:11px;color:var(--color-text-secondary)">Jméno</span>
+          <span style="font-size:11px;color:var(--color-text-secondary)">Role</span>
+          <span style="font-size:11px;color:var(--color-text-secondary)">Telefon</span>
+          <span style="font-size:11px;color:var(--color-text-secondary)">Viditelnost</span>
+          <span></span>
+        </div>
+        <div class="contacts-editor" id="contactsEditor"></div>
+        <button class="btn btn-sm" onclick="addContactRow()">+ Přidat kontakt</button>
+      </div>
+
+      <!-- TAB: INFORMACE -->
+      <div class="tab-content" id="tab-info">
+        <p style="font-size:13px;color:var(--color-text-secondary);margin-bottom:12px">Informace: <strong id="editingCatName2">—</strong></p>
+        <div class="info-editor" id="infoEditor"></div>
+        <button class="btn btn-sm" onclick="addInfoBlock()">+ Přidat blok</button>
+      </div>
+
+      <!-- TAB: NASTAVENÍ -->
+      <div class="tab-content" id="tab-settings">
+        <div style="border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:16px;margin-bottom:14px">
+          <p style="font-size:13px;font-weight:500;margin-bottom:12px">JSONBin Cloud Sync</p>
+          <div class="field-group">
+            <label>Veřejný BIN ID (pro veřejná data)</label>
+            <input type="text" id="pubBinId" placeholder="např. 6849abc123...">
+          </div>
+          <div class="field-group">
+            <label>Privátní BIN ID (pro interní data + vše)</label>
+            <input type="text" id="privBinId" placeholder="např. 6849xyz456...">
+          </div>
+          <p style="font-size:12px;color:var(--color-text-secondary);margin-bottom:10px">BIN IDs se ukládají lokálně v prohlížeči.</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-sm btn-accent" onclick="saveBinIds()">Uložit IDs</button>
+            <button class="btn btn-sm" onclick="initBins()">⚡ Vytvořit nové BINy automaticky</button>
+          </div>
+        </div>
+        <div style="border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:16px;margin-bottom:14px">
+          <p style="font-size:13px;font-weight:500;margin-bottom:12px">PIN</p>
+          <div class="field-group">
+            <label>Nový PIN (4 číslice)</label>
+            <input type="password" id="newPin" maxlength="4" placeholder="····" style="max-width:120px">
+          </div>
+          <button class="btn btn-sm btn-accent" onclick="changePin()">Uložit PIN</button>
+          <p style="font-size:12px;color:var(--color-text-secondary);margin-top:8px">PIN je uložen lokálně v prohlížeči.</p>
+        </div>
+        <div style="border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:16px">
+          <p style="font-size:13px;font-weight:500;margin-bottom:10px">Nebezpečné akce</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-danger btn-sm" onclick="resetData()">⚠ Obnovit výchozí data</button>
+            <button class="btn btn-danger btn-sm" onclick="forcePushAll()">☁ Vynutit sync do cloudu</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:14px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px">
+      <button class="btn" onclick="closeEditOverlay()">Zrušit</button>
+      <button class="btn btn-accent" onclick="saveAndClose()">💾 Uložit</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API_KEY='$2a$10$eWIWXhPM0SwH0406PZezkuM3Efo1gjKdDldXnvPIeRd.AJBHrtRqm';
+const JSONBIN_BASE='https://api.jsonbin.io/v3';
+const PIN_KEY='ov_pin';const BINS_KEY='ov_bins';const LOCAL_KEY='ov_local';
+
+const DEFAULT_CATEGORIES=[
+  {id:'vedeni',icon:'👑',color:'ic-a',title:'Vedení rally',hint:'Ředitel, zástupci, tajemník',keywords:'vedení ředitel zástupce tajemník štípek šefr sýkorová',
+    contacts:[{name:'Pavel Štípek',role:'Ředitel rally',phone:'720 037 750',vis:'public'},{name:'Petr Šefr',role:'Zástupce ředitele',phone:'777 140 013',vis:'public'},{name:'Václav Štípek',role:'Zástupce ředitele',phone:'',vis:'internal'},{name:'Tereza Sýkorová',role:'Tajemník rally',phone:'',vis:'internal'}],
+    info:[{label:'Ředitelství rally',text:'Cavok, Letiště Dlouhá Lhota\nGPS: 49°42\'56.682"N 14°5\'40.996"E\nTel: +420 720 037 750\ne-mail: reditelstvi@rally-pribram.cz',vis:'public'},{label:'Provozní doba',text:'23.7. 16:00–20:30\n24.7. 07:30–22:00\n25.7. 07:00–21:00',vis:'public'}]},
+  {id:'bezpecnost',icon:'🛡',color:'ic-d',title:'Bezpečnost a zdraví',hint:'Hlavní lékař, bezpečnostní činovník',keywords:'bezpečnost lékař zdraví franěk procházka švihálek záchrana 112',
+    contacts:[{name:'Jaroslav Švihálek',role:'Hlavní činovník pro bezpečnost',phone:'',vis:'internal'},{name:'MUDr. Ondřej Franěk',role:'Hlavní lékař',phone:'',vis:'internal'},{name:'MUDr. Milan Procházka',role:'Zástupce hlavního lékaře',phone:'',vis:'internal'}],
+    info:[{label:'Tísňová linka',text:'112\nČeský telefonní čas: 14112',vis:'public'},{label:'Označení bezpečnostních činovníků',text:'Vedoucí RZ – oranžová vesta "VEDOUCÍ RZ"\nVedoucí bezpečnosti – zelená vesta\nTraťoví komisaři – žlutá vesta s radiobod',vis:'public'}]},
+  {id:'technika',icon:'🔧',color:'ic-b',title:'Technická přejímka',hint:'Technický komisař, GPS/ONI systém',keywords:'technika přejímka komisař rejnart šedivý GPS ONI hlučnost homologace',
+    contacts:[{name:'Roman Rejnart',role:'Hlavní technický komisař',phone:'',vis:'public'},{name:'Václav Šedivý',role:'Hlavní technický komisař HA',phone:'',vis:'public'},{name:'Vojtěch Valenta / SAS Zlín',role:'Správce GPS ONI systému',phone:'',vis:'internal'}],
+    info:[{label:'Místo a čas technické přejímky',text:'Toyota Dolák Příbram, Evropská\n24. 7. 2026 · 14:30–19:30',vis:'public'},{label:'GPS / ONI — vrácení',text:'Tel: 722 734 127\nPoplatek: 170 Kč (ve vkladu)\nPokuta za nevrácení: 3 000 Kč',vis:'public'},{label:'Pokuta za pozdní příjezd',text:'1 000 Kč / každých 5 min\nNad 30 min → sportovní komisaři',vis:'internal'}]},
+  {id:'prihlasky',icon:'📋',color:'ic-c',title:'Přihlášky a vklady',hint:'Termíny, platby, vrácení vkladů',keywords:'přihláška vklad platba termín uzávěrka vrácení banka FIO',
+    contacts:[{name:'Ředitelství rally',role:'Dotazy k přihláškám',phone:'777 140 013',vis:'public'}],
+    info:[{label:'Klíčové termíny',text:'Zahájení příjmu: 25. 5. 2026\nUzávěrka přihlášek: 13. 7. 2026 · 20:00\nPublikace přihlášených: 16. 7. 2026',vis:'public'},{label:'Bankovní spojení',text:'FIO Banka · č.ú. 2601003927/2010\nIBAN: CZ9420100000002601003927',vis:'public'},{label:'Vrácení vkladu',text:'Před uzávěrkou: 100 %\nPřed sez. jízdami: min. 80 %\nPřed adm. přejímkou: 50 %',vis:'public'}]},
+  {id:'soutezici',icon:'🏁',color:'ic-e',title:'Styk se soutěžícími',hint:'Činovník pro styk — Sára Hefnerová',keywords:'soutěžící jezdci posádky hefnerová styk dotazy sportity',
+    contacts:[{name:'Sára Hefnerová',role:'Činovník pro styk se soutěžícími',phone:'737 202 809',vis:'public'}],
+    info:[{label:'Sportity — elektronická vývěska',text:'webapp.sportity.com/channel/pribram2026\nHeslo: Pribram2026',vis:'public'},{label:'Administrativní přejímka',text:'Toyota Dolák Příbram\n24. 7. 2026 · 14:00–18:30',vis:'public'}]},
+  {id:'casomeric',icon:'⏱',color:'ic-f',title:'Časoměření a výsledky',hint:'Hlavní časoměřič, výsledky',keywords:'čas časoměření výsledky klasifikace just šperka RE-CO',
+    contacts:[{name:'Ladislav Just',role:'Hlavní časoměřič',phone:'',vis:'internal'},{name:'Ing. Lubomír Šperka / RE-CO',role:'Zpracovatelská skupina',phone:'',vis:'internal'}],
+    info:[{label:'Výsledky — publikace',text:'Startovní listina: 24. 7. · 21:30\nPředběžná klasifikace: 25. 7. · 19:30\nKonečná: po uplynutí protestní doby',vis:'public'},{label:'Kde hledat',text:'www.rally-pribram.cz (DNB)\nAplikace SPORTITY',vis:'public'}]},
+  {id:'servis',icon:'🚗',color:'ic-d',title:'Servisní zóna a trať',hint:'Letiště Dlouhá Lhota, RZ, tankování',keywords:'servis servisní zóna letiště trať RZ rychlostní zkouška tankování Sedlčany',
+    contacts:[{name:'Miroslav Žitník',role:'Vedoucí dispečinku',phone:'',vis:'internal'},{name:'Zbyněk Stach',role:'Činovník pro životní prostředí',phone:'',vis:'internal'}],
+    info:[{label:'Servisní zóna',text:'Letiště Dlouhá Lhota\nGPS: 49°42\'56.682"N 14°5\'40.996"E\nPá 24. 7. 10:00–21:00 · So 25. 7. od 06:30',vis:'public'},{label:'Start rally',text:'Náměstí T. G. Masaryka, Příbram\n25. 7. 2026 · 09:00\nCílový ceremoniál: 17:30',vis:'public'},{label:'Pokuta — servisní zóna',text:'10 000 Kč za nedodržení vstupních časů\nV servisní době: zákaz pohybu servisních aut',vis:'internal'},{label:'Vzdálená tankovací zóna',text:'Sedlčany · GPS: 49°39\'13.354"N, 14°26\'16.052"E\n25. 7. 10:15–17:15',vis:'public'}]},
+  {id:'tisk',icon:'📰',color:'ic-b',title:'Tisk a média',hint:'Tisková střediska, akreditace',keywords:'tisk média novináři tisková střediska šefrová barbora eliáš akreditace',
+    contacts:[{name:'Barbora Šefrová',role:'Hlavní činovník pro tisk',phone:'',vis:'internal'},{name:'Radovan Eliáš',role:'Media delegát AS AČR',phone:'',vis:'public'}],
+    info:[{label:'Tiskové středisko',text:'MKC Příbram, Špitálská 18 (Špalíček)\nGPS: N 49°41.22523\', E 14°0.51205\'\n24. 7.: 14:30–21:00\n25. 7.: 07:30–10:30 a 14:00–20:00',vis:'public'}]},
+  {id:'komisari',icon:'⚖️',color:'ic-a',title:'Sportovní komisaři',hint:'Protesty, penalizace, pravidla',keywords:'komisař protest penalizace pravidla nejdl bělák mynářová panušková',
+    contacts:[{name:'Jiří Nejdl',role:'Hlavní sportovní komisař',phone:'',vis:'public'},{name:'Zdeněk Bělák',role:'Sportovní komisař',phone:'',vis:'public'},{name:'Petra Mynářová',role:'Sportovní komisař',phone:'',vis:'public'},{name:'Kristýna Panušková',role:'Sekretář SSK',phone:'',vis:'internal'}],
+    info:[{label:'Poplatky při protestu',text:'Protest: 15 000 Kč\nOdvolání (ASN): 30 000 Kč',vis:'public'},{label:'Vybrané sankce',text:'Retardér (posunutí): +30 sek\nPozdní příjezd na přejímku: 1 000 Kč / 5 min',vis:'internal'}]},
+];
+
+let categories=[];let editBuffer=null;let selectedEditCatId=null;let activeCatId=null;let pinBuffer='';let isInternal=false;
+
+function getPin(){return localStorage.getItem(PIN_KEY)||'2608'}
+function getBins(){try{return JSON.parse(localStorage.getItem(BINS_KEY))||{}}catch(e){return{}}}
+function saveBinsLocal(b){localStorage.setItem(BINS_KEY,JSON.stringify(b))}
+
+async function binFetch(method,path,body){
+  const opts={method,headers:{'Content-Type':'application/json','X-Master-Key':API_KEY,'X-Bin-Versioning':'false'}};
+  if(body!==undefined)opts.body=JSON.stringify(body);
+  const res=await fetch(JSONBIN_BASE+path,opts);
+  if(!res.ok)throw new Error('HTTP '+res.status);
+  return res.json();
+}
+async function createBin(data){const r=await binFetch('POST','/b',data);return r.metadata.id}
+async function readBin(id){const r=await binFetch('GET','/b/'+id+'/latest');return r.record}
+async function writeBin(id,data){await binFetch('PUT','/b/'+id,data)}
+
+function setSyncStatus(state,text){document.getElementById('syncDot').className='sync-dot '+state;document.getElementById('syncText').textContent=text;}
+
+function getVisible(cats,internal){
+  return cats.map(cat=>({...cat,contacts:cat.contacts.filter(c=>internal||c.vis==='public'),info:cat.info.filter(i=>internal||i.vis==='public')})).filter(cat=>cat.contacts.length>0||cat.info.length>0);
+}
+function splitData(cats){
+  const pub=cats.map(cat=>({...cat,contacts:cat.contacts.filter(c=>c.vis==='public'),info:cat.info.filter(i=>i.vis==='public')}));
+  return{pub,all:cats};
+}
+
+async function loadFromCloud(){
+  const bins=getBins();setSyncStatus('loading','Načítám data…');
+  if(!bins.pubId&&!bins.privId){
+    categories=JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
+    localStorage.setItem(LOCAL_KEY,JSON.stringify(categories));
+    setSyncStatus('ok','Lokální data — cloud není nastaven (viz Nastavení v editoru)');return;
+  }
+  try{
+    if(bins.privId&&isInternal){const data=await readBin(bins.privId);categories=data.categories||DEFAULT_CATEGORIES;}
+    else if(bins.pubId){
+      const data=await readBin(bins.pubId);
+      const localRaw=localStorage.getItem(LOCAL_KEY);
+      if(localRaw&&isInternal)categories=JSON.parse(localRaw);
+      else categories=(data.categories||DEFAULT_CATEGORIES).map(c=>({...c,contacts:c.contacts.map(x=>({...x,vis:x.vis||'public'})),info:c.info.map(x=>({...x,vis:x.vis||'public'}))}));
+    }
+    setSyncStatus('ok','Synchronizováno · '+new Date().toLocaleTimeString('cs'));
+  }catch(e){
+    const loc=localStorage.getItem(LOCAL_KEY);
+    if(loc){categories=JSON.parse(loc);setSyncStatus('err','Offline — lokální data');}
+    else{categories=JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));setSyncStatus('err','Offline — výchozí data');}
+  }
+}
+
+async function pushToCloud(cats){
+  const bins=getBins();const{pub,all}=splitData(cats);setSyncStatus('loading','Ukládám do cloudu…');const errs=[];
+  if(bins.pubId){try{await writeBin(bins.pubId,{categories:pub})}catch(e){errs.push('veřejný BIN');}}
+  if(bins.privId){try{await writeBin(bins.privId,{categories:all})}catch(e){errs.push('interní BIN');}}
+  localStorage.setItem(LOCAL_KEY,JSON.stringify(cats));
+  if(errs.length)setSyncStatus('err','Chyba: '+errs.join(', '));
+  else setSyncStatus('ok','Uloženo · '+new Date().toLocaleTimeString('cs'));
+}
+
+function renderGrid(cats){
+  const grid=document.getElementById('grid'),detail=document.getElementById('detail'),noRes=document.getElementById('noResults');
+  grid.innerHTML='';detail.innerHTML='';detail.classList.remove('show');activeCatId=null;
+  if(!cats.length){noRes.style.display='block';return;}noRes.style.display='none';
+  cats.forEach(cat=>{
+    const b=document.createElement('div');b.className='bubble';b.id='bub-'+cat.id;
+    b.innerHTML=`<div class="bubble-icon ${cat.color}">${cat.icon}</div><div class="bubble-title">${cat.title}</div><div class="bubble-hint">${cat.hint}</div><span class="bubble-count">${cat.contacts.length}</span>`;
+    b.onclick=()=>toggleDetail(cat,b);grid.appendChild(b);
+  });
+}
+
+function toggleDetail(cat,btn){
+  const detail=document.getElementById('detail');
+  if(activeCatId===cat.id){detail.classList.remove('show');btn.classList.remove('active');activeCatId=null;return;}
+  document.querySelectorAll('.bubble').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');activeCatId=cat.id;
+  const avC=['av-a','av-b','av-c','av-d','av-e','av-f'];
+  const vt=v=>isInternal?`<span class="vis-tag ${v}">${v==='public'?'Veřejné':'Interní'}</span>`:'';
+  let html=`<div class="detail-header"><h2>${cat.icon} ${cat.title}</h2></div><div class="detail-body">`;
+  if(cat.contacts.length){
+    html+=`<div class="section-label">Kontakty</div><div class="contacts-grid">`;
+    cat.contacts.forEach((c,i)=>{
+      const ini=c.name.split(' ').map(w=>w[0]).filter((_,j,a)=>j===0||j===a.length-1).join('').toUpperCase();
+      html+=`<div class="contact-card"><div class="contact-av ${avC[i%6]}">${ini}</div><div class="contact-info"><div class="contact-name">${esc(c.name)}${vt(c.vis||'public')}</div><div class="contact-role">${esc(c.role)}</div>${c.phone?`<a class="contact-phone" href="tel:${c.phone.replace(/\s/g,'')}">📞 ${esc(c.phone)}</a>`:''}</div></div>`;
+    });html+='</div>';
+  }
+  if(cat.info.length){
+    html+=`<div class="section-label">Informace</div><div class="info-blocks">`;
+    cat.info.forEach(inf=>{html+=`<div class="info-block"><div class="info-block-label">${esc(inf.label)}${vt(inf.vis||'public')}</div><p>${esc(inf.text).replace(/\n/g,'<br>')}</p></div>`;});
+    html+='</div>';
+  }
+  html+='</div>';detail.innerHTML=html;detail.classList.add('show');
+  setTimeout(()=>detail.scrollIntoView({behavior:'smooth',block:'nearest'}),60);
+}
+
+function filterBubbles(){
+  const q=document.getElementById('searchInput').value.toLowerCase().trim();
+  const vis=getVisible(categories,isInternal);
+  if(!q){renderGrid(vis);return;}
+  renderGrid(vis.filter(c=>c.title.toLowerCase().includes(q)||(c.hint||'').toLowerCase().includes(q)||(c.keywords||'').toLowerCase().includes(q)||c.contacts.some(x=>x.name.toLowerCase().includes(q)||x.role.toLowerCase().includes(q)||(x.phone||'').includes(q))||c.info.some(x=>x.label.toLowerCase().includes(q)||x.text.toLowerCase().includes(q))));
+}
+
+function refreshView(){
+  filterBubbles();
+  const badge=document.getElementById('modeBadge'),lbl=document.getElementById('modeLabel'),btn=document.getElementById('mainBtn');
+  if(isInternal){
+    badge.className='mode-badge internal';badge.textContent='Interní pohled';
+    lbl.textContent='OV · Interní přístup';btn.textContent='✎ Upravit data';
+    document.getElementById('exportBtn').style.display='inline-flex';
+    document.getElementById('importBtn').style.display='inline-flex';
+  }else{
+    badge.className='mode-badge public';badge.textContent='Veřejný pohled';
+    lbl.textContent='Rozcestník · 24.–25. 7. 2026';btn.textContent='🔒 Přihlásit';
+    document.getElementById('exportBtn').style.display='none';
+    document.getElementById('importBtn').style.display='none';
+  }
+}
+
+function handleMainBtn(){if(isInternal)openEditOverlay();else openPinOverlay();}
+function openPinOverlay(){pinBuffer='';updatePinDots();document.getElementById('pinError').textContent='';document.getElementById('pinOverlay').classList.add('show');}
+function closePinOverlay(){document.getElementById('pinOverlay').classList.remove('show');pinBuffer='';}
+function pinKey(k){
+  if(k==='del'){pinBuffer=pinBuffer.slice(0,-1);updatePinDots();return;}
+  if(pinBuffer.length>=4)return;pinBuffer+=k;updatePinDots();
+  if(pinBuffer.length===4){setTimeout(async()=>{
+    if(pinBuffer===getPin()){isInternal=true;closePinOverlay();await loadFromCloud();refreshView();}
+    else{document.getElementById('pinError').textContent='Špatný PIN, zkuste znovu.';pinBuffer='';updatePinDots();}
+  },150);}
+}
+function updatePinDots(){for(let i=0;i<4;i++)document.getElementById('d'+i).classList.toggle('filled',i<pinBuffer.length);}
+
+function openEditOverlay(){
+  editBuffer=JSON.parse(JSON.stringify(categories));selectedEditCatId=editBuffer[0]?.id||null;
+  renderCatList();renderContactsEditor();renderInfoEditor();
+  const bins=getBins();document.getElementById('pubBinId').value=bins.pubId||'';document.getElementById('privBinId').value=bins.privId||'';
+  switchTab('cats');document.getElementById('editOverlay').classList.add('show');
+}
+function closeEditOverlay(){document.getElementById('editOverlay').classList.remove('show');}
+async function saveAndClose(){
+  flushEditors();categories=editBuffer;
+  const btn=document.getElementById('saveBtn');btn.disabled=true;btn.textContent='⏳ Ukládám…';
+  await pushToCloud(categories);btn.disabled=false;btn.textContent='💾 Uložit';
+  refreshView();closeEditOverlay();
+}
+function switchTab(t){
+  const ids=['cats','contacts','info','settings'];
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',ids[i]===t));
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+  document.getElementById('tab-'+t).classList.add('active');
+}
+
+function renderCatList(){
+  const el=document.getElementById('catList');el.innerHTML='';
+  editBuffer.forEach(cat=>{
+    const item=document.createElement('div');item.className='cat-edit-item'+(cat.id===selectedEditCatId?' selected':'');
+    item.innerHTML=`<span class="cat-edit-icon">${cat.icon}</span><div class="cat-edit-info"><div class="cat-edit-name">${esc(cat.title)}</div><div class="cat-edit-count">${cat.contacts.length} kontaktů · ${cat.info.length} info bloků</div></div>`;
+    item.onclick=()=>{flushEditors();selectedEditCatId=cat.id;renderCatList();renderContactsEditor();renderInfoEditor();document.getElementById('delCatBtn').style.display='inline-flex';};
+    el.appendChild(item);
+  });
+  document.getElementById('delCatBtn').style.display=selectedEditCatId?'inline-flex':'none';
+}
+function getSelectedCat(){return editBuffer.find(c=>c.id===selectedEditCatId);}
+function addCategory(){flushEditors();const id='cat_'+Date.now();editBuffer.push({id,icon:'📌',color:'ic-a',title:'Nová kategorie',hint:'',keywords:'',contacts:[],info:[]});selectedEditCatId=id;renderCatList();renderContactsEditor();renderInfoEditor();}
+function deleteSelectedCategory(){if(!selectedEditCatId||!confirm('Opravdu smazat?'))return;editBuffer=editBuffer.filter(c=>c.id!==selectedEditCatId);selectedEditCatId=editBuffer[0]?.id||null;renderCatList();renderContactsEditor();renderInfoEditor();}
+
+function renderContactsEditor(){
+  const cat=getSelectedCat();document.getElementById('editingCatName').textContent=cat?cat.title:'—';
+  const el=document.getElementById('contactsEditor');el.innerHTML='';if(!cat)return;
+  cat.contacts.forEach((c,i)=>{
+    const v=c.vis||'public';const row=document.createElement('div');row.className='contact-edit-row';row.dataset.idx=i;
+    row.innerHTML=`<input class="cer-input" placeholder="Jméno" value="${esc(c.name)}" data-field="name"><input class="cer-input" placeholder="Role / funkce" value="${esc(c.role)}" data-field="role"><input class="cer-input" placeholder="Telefon" value="${esc(c.phone||'')}" data-field="phone"><select class="vis-sel ${v}" data-field="vis" onchange="this.className='vis-sel '+this.value"><option value="public" ${v==='public'?'selected':''}>Veřejné</option><option value="internal" ${v==='internal'?'selected':''}>Interní</option></select><button class="del-btn" onclick="removeContactRow(${i})">✕</button>`;
+    el.appendChild(row);
+  });
+}
+function addContactRow(){flushEditors();const cat=getSelectedCat();if(!cat)return;cat.contacts.push({name:'',role:'',phone:'',vis:'public'});renderContactsEditor();}
+function removeContactRow(i){flushEditors();const cat=getSelectedCat();if(!cat)return;cat.contacts.splice(i,1);renderContactsEditor();}
+
+function renderInfoEditor(){
+  const cat=getSelectedCat();document.getElementById('editingCatName2').textContent=cat?cat.title:'—';
+  const el=document.getElementById('infoEditor');el.innerHTML='';if(!cat)return;
+  cat.info.forEach((inf,i)=>{
+    const v=inf.vis||'public';const row=document.createElement('div');row.className='info-edit-row';row.dataset.idx=i;
+    row.innerHTML=`<button class="del-btn" onclick="removeInfoBlock(${i})">✕</button><input placeholder="Nadpis bloku" value="${esc(inf.label)}" data-field="label" style="background:var(--color-background-secondary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);color:var(--color-text-primary);font-size:13px;padding:7px 10px;outline:none;width:calc(100% - 44px)"><textarea placeholder="Text (Enter = nový řádek)" data-field="text" style="background:var(--color-background-secondary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);color:var(--color-text-primary);font-size:13px;padding:7px 10px;outline:none;width:100%;resize:vertical;min-height:70px">${esc(inf.text)}</textarea><div class="vis-row"><label>Viditelnost:</label><select class="vis-sel ${v}" data-field="vis" onchange="this.className='vis-sel '+this.value" style="width:auto"><option value="public" ${v==='public'?'selected':''}>Veřejné</option><option value="internal" ${v==='internal'?'selected':''}>Interní</option></select></div>`;
+    el.appendChild(row);
+  });
+}
+function addInfoBlock(){flushEditors();const cat=getSelectedCat();if(!cat)return;cat.info.push({label:'',text:'',vis:'public'});renderInfoEditor();}
+function removeInfoBlock(i){flushEditors();const cat=getSelectedCat();if(!cat)return;cat.info.splice(i,1);renderInfoEditor();}
+
+function flushEditors(){
+  const cat=getSelectedCat();if(!cat)return;
+  document.querySelectorAll('#contactsEditor .contact-edit-row').forEach((row,i)=>{if(!cat.contacts[i])return;row.querySelectorAll('[data-field]').forEach(el=>{cat.contacts[i][el.dataset.field]=el.value;});});
+  document.querySelectorAll('#infoEditor .info-edit-row').forEach((row,i)=>{if(!cat.info[i])return;row.querySelectorAll('[data-field]').forEach(el=>{cat.info[i][el.dataset.field]=el.value;});});
+}
+
+function saveBinIds(){const pubId=document.getElementById('pubBinId').value.trim();const privId=document.getElementById('privBinId').value.trim();saveBinsLocal({pubId,privId});alert('BIN IDs uloženy ✓');}
+async function initBins(){
+  if(!confirm('Vytvoří se 2 nové JSONBin BINy a přepíší stávající IDs. Pokračovat?'))return;
+  setSyncStatus('loading','Vytvářím BINy…');
+  try{
+    const{pub}=splitData(categories);
+    const pubId=await createBin({categories:pub});
+    const privId=await createBin({categories});
+    saveBinsLocal({pubId,privId});
+    document.getElementById('pubBinId').value=pubId;
+    document.getElementById('privBinId').value=privId;
+    setSyncStatus('ok','BINy vytvořeny · '+new Date().toLocaleTimeString('cs'));
+    alert('Hotovo!\nVerejný BIN ID: '+pubId+'\nInterní BIN ID: '+privId+'\n\nIDs jsou uloženy. Sdílej veřejný BIN ID s těmi, kdo potřebují jen veřejnou verzi.');
+  }catch(e){setSyncStatus('err','Chyba: '+e.message);alert('Chyba: '+e.message);}
+}
+function changePin(){const v=document.getElementById('newPin').value.trim();if(!/^\d{4}$/.test(v)){alert('PIN musí být 4 číslice.');return;}localStorage.setItem(PIN_KEY,v);document.getElementById('newPin').value='';alert('PIN byl změněn ✓');}
+async function forcePushAll(){if(!confirm('Vynutit sync všech dat do cloudu?'))return;await pushToCloud(categories);}
+function resetData(){if(!confirm('Obnovit výchozí data? Všechny změny budou ztraceny.'))return;editBuffer=JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));selectedEditCatId=editBuffer[0]?.id;renderCatList();renderContactsEditor();renderInfoEditor();}
+
+function exportExcel(){
+  const wb=XLSX.utils.book_new();
+  const cr=[['Kategorie','Jméno','Role','Telefon','Viditelnost']];
+  categories.forEach(cat=>cat.contacts.forEach(c=>cr.push([cat.title,c.name,c.role,c.phone||'',c.vis||'public'])));
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(cr),'Kontakty');
+  const ir=[['Kategorie','Nadpis','Text','Viditelnost']];
+  categories.forEach(cat=>cat.info.forEach(inf=>ir.push([cat.title,inf.label,inf.text,inf.vis||'public'])));
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(ir),'Informace');
+  XLSX.writeFile(wb,'rally-pribram-ov-2026.xlsx');
+}
+function importExcel(event){
+  const file=event.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const wb=XLSX.read(e.target.result,{type:'binary'});
+      const cs=wb.Sheets['Kontakty'],is=wb.Sheets['Informace'];
+      if(!cs){alert('Soubor musí obsahovat list "Kontakty".');return;}
+      const contacts=XLSX.utils.sheet_to_json(cs,{header:1}).slice(1);
+      const infos=is?XLSX.utils.sheet_to_json(is,{header:1}).slice(1):[];
+      const newCats=JSON.parse(JSON.stringify(categories));newCats.forEach(c=>{c.contacts=[];c.info=[];});
+      contacts.forEach(([catName,name,role,phone,vis])=>{let cat=newCats.find(c=>c.title.toLowerCase()===(catName||'').toLowerCase());if(!cat){cat={id:'imp_'+Date.now(),icon:'📌',color:'ic-a',title:catName||'Import',hint:'',keywords:'',contacts:[],info:[]};newCats.push(cat);}if(name)cat.contacts.push({name,role:role||'',phone:phone||'',vis:vis||'public'});});
+      infos.forEach(([catName,label,text,vis])=>{const cat=newCats.find(c=>c.title.toLowerCase()===(catName||'').toLowerCase());if(cat&&label)cat.info.push({label,text:text||'',vis:vis||'public'});});
+      categories=newCats;localStorage.setItem(LOCAL_KEY,JSON.stringify(categories));
+      refreshView();alert('Import úspěšný ✓\nNezapomeň uložit a synchronizovat do cloudu (tlačítko Upravit data → Uložit).');
+    }catch(err){alert('Chyba při importu: '+err.message);}
+    event.target.value='';
+  };reader.readAsBinaryString(file);
+}
+
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+(async()=>{await loadFromCloud();refreshView();})();
+</script>
+</body>
+</html>
