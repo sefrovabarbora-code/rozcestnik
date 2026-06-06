@@ -501,6 +501,10 @@ body {
 .ai-typing span:nth-child(2){animation-delay:0.2s}
 .ai-typing span:nth-child(3){animation-delay:0.4s}
 @keyframes tdot{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+
+.sec-btn{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;padding:6px 14px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;transition:all 0.15s;white-space:nowrap}
+.sec-btn:hover{background:var(--bg3);color:var(--text);border-color:var(--border3)}
+.sec-btn.active{background:var(--accent2);border-color:var(--accent);color:var(--accent)}
 </style>
 </head>
 <body>
@@ -676,7 +680,7 @@ body {
 <script>
 const API_KEY='$2a$10$eWIWXhPM0SwH0406PZezkuM3Efo1gjKdDldXnvPIeRd.AJBHrtRqm';
 const JSONBIN_BASE='https://api.jsonbin.io/v3';
-const PIN_KEY='ov_pin';const BINS_KEY='ov_bins';const LOCAL_KEY='ov_local';
+const PIN_KEY='ov_pin';const EDIT_PIN_KEY='ov_edit_pin';const BINS_KEY='ov_bins';const LOCAL_KEY='ov_local';
 
 const DEFAULT_CATEGORIES=[
   {id:'vedeni',icon:'👑',color:'ic-a',title:'Vedení rally',hint:'Ředitel, zástupci, tajemník',keywords:'vedení ředitel zástupce tajemník štípek šefr sýkorová',
@@ -914,6 +918,7 @@ const DEFAULT_CATEGORIES=[
 let categories=[];let editBuffer=null;let selectedEditCatId=null;let activeCatId=null;let pinBuffer='';let isInternal=false;
 
 function getPin(){return localStorage.getItem(PIN_KEY)||'9889'}
+function getEditPin(){return localStorage.getItem(EDIT_PIN_KEY)||'9889'}
 function getBins(){
   try{
     const stored = JSON.parse(localStorage.getItem(BINS_KEY))||{};
@@ -980,6 +985,38 @@ async function pushToCloud(cats){
   else setSyncStatus('ok','Uloženo · '+new Date().toLocaleTimeString('cs'));
 }
 
+
+// ── SEKCE ────────────────────────────────────────
+const SECTIONS = [
+  {id:'all', label:'Vše', icon:''},
+  {id:'soutez', label:'Soutěž', icon:'🏎',
+    ids:['prihlasky','adminprejimka','techprejimka','komisari','casomeric','soutezici']},
+  {id:'provoz', label:'Provoz rally', icon:'🏁',
+    ids:['vedeni','servis','bezpecnost','obk','mtz','tratove','program']},
+  {id:'verejnost', label:'Veřejnost', icon:'👥',
+    ids:['divaci','vip','merch','stanky','tisk']},
+  {id:'interni', label:'Interní OV', icon:'⚙️',
+    ids:['finance','tiskoviny','ubytovani','komisari','casomeric']},
+];
+let activeSection = 'all';
+
+function renderSectionTabs() {
+  const existing = document.getElementById('sectionTabs');
+  if (existing) existing.remove();
+  const wrap = document.createElement('div');
+  wrap.id = 'sectionTabs';
+  wrap.style.cssText = 'display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px';
+  SECTIONS.forEach(sec => {
+    const btn = document.createElement('button');
+    btn.className = 'sec-btn' + (activeSection === sec.id ? ' active' : '');
+    btn.innerHTML = (sec.icon ? sec.icon + ' ' : '') + sec.label;
+    btn.onclick = () => { activeSection = sec.id; renderSectionTabs(); filterBubbles(); };
+    wrap.appendChild(btn);
+  });
+  const grid = document.getElementById('grid');
+  grid.parentNode.insertBefore(wrap, grid);
+}
+
 function renderGrid(cats){
   const grid=document.getElementById('grid'),detail=document.getElementById('detail'),noRes=document.getElementById('noResults');
   grid.innerHTML='';detail.innerHTML='';detail.classList.remove('show');activeCatId=null;
@@ -1017,7 +1054,14 @@ function toggleDetail(cat,btn){
 
 function filterBubbles(){
   const q=document.getElementById('searchInput').value.toLowerCase().trim();
-  const vis=getVisible(categories,isInternal);
+  let vis=getVisible(categories,isInternal);
+  // Filter by section
+  if(activeSection !== 'all') {
+    const sec = SECTIONS.find(s => s.id === activeSection);
+    if(sec) vis = vis.filter(c => sec.ids.includes(c.id));
+  }
+  // Sort alphabetically
+  vis = [...vis].sort((a,b) => a.title.localeCompare(b.title, 'cs'));
   if(!q){renderGrid(vis);return;}
   renderGrid(vis.filter(c=>c.title.toLowerCase().includes(q)||(c.hint||'').toLowerCase().includes(q)||(c.keywords||'').toLowerCase().includes(q)||c.contacts.some(x=>x.name.toLowerCase().includes(q)||x.role.toLowerCase().includes(q)||(x.phone||'').includes(q))||c.info.some(x=>x.label.toLowerCase().includes(q)||x.text.toLowerCase().includes(q))));
 }
@@ -1036,9 +1080,13 @@ function refreshView(){
     document.getElementById('exportBtn').style.display='none';
     document.getElementById('importBtn').style.display='none';
   }
+  renderSectionTabs();
 }
 
-function handleMainBtn(){if(isInternal)openEditOverlay();else openPinOverlay();}
+function handleMainBtn(){
+  if(isInternal) openEditPinOverlay();
+  else openPinOverlay();
+}
 function openPinOverlay(){pinBuffer='';updatePinDots();document.getElementById('pinError').textContent='';document.getElementById('pinOverlay').classList.add('show');}
 function closePinOverlay(){document.getElementById('pinOverlay').classList.remove('show');pinBuffer='';}
 function pinKey(k){
@@ -1130,7 +1178,8 @@ async function initBins(){
     alert('Hotovo!\nVerejný BIN ID: '+pubId+'\nInterní BIN ID: '+privId+'\n\nIDs jsou uloženy. Sdílej veřejný BIN ID s těmi, kdo potřebují jen veřejnou verzi.');
   }catch(e){setSyncStatus('err','Chyba: '+e.message);alert('Chyba: '+e.message);}
 }
-function changePin(){const v=document.getElementById('newPin').value.trim();if(!/^\d{4}$/.test(v)){alert('PIN musí být 4 číslice.');return;}localStorage.setItem(PIN_KEY,v);document.getElementById('newPin').value='';alert('PIN byl změněn ✓');}
+function changePin(){const v=document.getElementById('newPin').value.trim();if(!/^\d{4}$/.test(v)){alert('PIN musí být 4 číslice.');return;}localStorage.setItem(PIN_KEY,v);document.getElementById('newPin').value='';alert('PIN pro zobrazení byl změněn ✓');}
+function changeEditPin(){const v=document.getElementById('newEditPin').value.trim();if(!/^\d{4}$/.test(v)){alert('PIN musí být 4 číslice.');return;}localStorage.setItem(EDIT_PIN_KEY,v);document.getElementById('newEditPin').value='';alert('PIN pro editaci byl změněn ✓');}
 async function forcePushAll(){if(!confirm('Vynutit sync všech dat do cloudu?'))return;await pushToCloud(categories);}
 function resetData(){if(!confirm('Obnovit výchozí data? Všechny změny budou ztraceny.'))return;editBuffer=JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));selectedEditCatId=editBuffer[0]?.id;renderCatList();renderContactsEditor();renderInfoEditor();}
 
@@ -1318,6 +1367,19 @@ function scrollToBubble(catId) {
     setTimeout(() => bub.click(), 400);
   }
 }
+
+let editPinBuffer='';
+function openEditPinOverlay(){editPinBuffer='';updateEditPinDots();document.getElementById('editPinError').textContent='';document.getElementById('editPinOverlay').classList.add('show');}
+function closeEditPinOverlay(){document.getElementById('editPinOverlay').classList.remove('show');editPinBuffer='';}
+function editPinKey(k){
+  if(k==='del'){editPinBuffer=editPinBuffer.slice(0,-1);updateEditPinDots();return;}
+  if(editPinBuffer.length>=4)return;editPinBuffer+=k;updateEditPinDots();
+  if(editPinBuffer.length===4){setTimeout(()=>{
+    if(editPinBuffer===getEditPin()){closeEditPinOverlay();openEditOverlay();}
+    else{document.getElementById('editPinError').textContent='Špatný PIN.';editPinBuffer='';updateEditPinDots();}
+  },150);}
+}
+function updateEditPinDots(){for(let i=0;i<4;i++)document.getElementById('ed'+i).classList.toggle('filled',i<editPinBuffer.length);}
 </script>
 </body>
 </html>
