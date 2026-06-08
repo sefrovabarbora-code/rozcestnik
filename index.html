@@ -1306,7 +1306,7 @@ function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').repla
 // ══════════════════════════════════════════════
 // LOGOVÁNÍ KONVERZACÍ
 // ══════════════════════════════════════════════
-function getLogBin(){return localStorage.getItem(LOG_KEY)||'';}
+function getLogBin(){return localStorage.getItem(LOG_KEY)||'6a266fc5da38895dfe983ca7';}
 
 async function logConversation(question, answer) {
   const logBinId = getLogBin();
@@ -1354,10 +1354,12 @@ async function viewLogs() {
 
 function exportLogsExcel(logs) {
   const wb = XLSX.utils.book_new();
-  const rows = [['Datum a čas', 'Dotaz', 'Odpověď AI', 'Režim']];
+  const rows = [['Datum a čas', 'Dotaz', 'Odpověď AI', 'Režim', 'Zdroj']];
   logs.forEach(l => {
     const date = new Date(l.ts).toLocaleString('cs');
-    rows.push([date, l.q, l.a, l.mode === 'internal' ? 'Interní' : 'Veřejný']);
+    const mode = l.mode === 'internal' ? 'Interní' : 'Veřejný';
+    const source = l.source === 'web' ? 'Web' : 'Rozcestník';
+    rows.push([date, l.q, l.a, mode, source]);
   });
   XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rows), 'Konverzace');
   XLSX.writeFile(wb, 'rally-pribram-konverzace.xlsx');
