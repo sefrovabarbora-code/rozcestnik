@@ -632,10 +632,22 @@ body {
 
       <!-- TAB: KATEGORIE -->
       <div class="tab-content active" id="tab-cats">
-        <p style="font-size:13px;color:var(--text3);margin-bottom:12px">Vyberte kategorii pro editaci kontaktů a informací:</p>
+        <p style="font-size:13px;color:var(--text3);margin-bottom:12px">Vyberte kategorii pro editaci:</p>
         <div class="cat-list" id="catList"></div>
+        <div id="catNameEditor" style="display:none;margin-bottom:12px;padding:12px 14px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--rs)">
+          <div style="display:grid;grid-template-columns:1fr 80px;gap:8px">
+            <div class="field-group" style="margin-bottom:0">
+              <label>Název kategorie</label>
+              <input type="text" id="catNameInput" placeholder="Název kategorie" oninput="updateCatName(this.value)">
+            </div>
+            <div class="field-group" style="margin-bottom:0">
+              <label>Ikona</label>
+              <input type="text" id="catIconInput" placeholder="📌" oninput="updateCatIcon(this.value)">
+            </div>
+          </div>
+        </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn" onclick="addCategory()">+ Přidat kategorii</button>
+          <button class="btn btn-sm" onclick="addCategory()">+ Přidat kategorii</button>
           <button class="btn btn-danger btn-sm" id="delCatBtn" onclick="deleteSelectedCategory()" style="display:none">✕ Smazat vybranou</button>
         </div>
       </div>
@@ -1147,7 +1159,7 @@ function updatePinDots(){for(let i=0;i<4;i++)document.getElementById('d'+i).clas
 
 function openEditOverlay(){
   editBuffer=JSON.parse(JSON.stringify(categories));selectedEditCatId=editBuffer[0]?.id||null;
-  renderCatList();renderContactsEditor();renderInfoEditor();
+  renderCatList();renderContactsEditor();renderInfoEditor();renderCatNameEditor();
   const bins=getBins();document.getElementById('pubBinId').value=bins.pubId||'';document.getElementById('privBinId').value=bins.privId||'';if(document.getElementById('logBinId')) document.getElementById('logBinId').value=getLogBin()||'';
   switchTab('cats');document.getElementById('editOverlay').classList.add('show');
 }
@@ -1176,6 +1188,24 @@ function renderCatList(){
   document.getElementById('delCatBtn').style.display=selectedEditCatId?'inline-flex':'none';
 }
 function getSelectedCat(){return editBuffer.find(c=>c.id===selectedEditCatId);}
+function renderCatNameEditor() {
+  const cat = getSelectedCat();
+  const editor = document.getElementById('catNameEditor');
+  if (!cat) { editor.style.display='none'; return; }
+  editor.style.display = 'block';
+  document.getElementById('catNameInput').value = cat.title || '';
+  document.getElementById('catIconInput').value = cat.icon || '';
+}
+function updateCatName(val) {
+  const cat = getSelectedCat(); if (!cat) return;
+  cat.title = val;
+  renderCatList();
+}
+function updateCatIcon(val) {
+  const cat = getSelectedCat(); if (!cat) return;
+  cat.icon = val;
+  renderCatList();
+}
 function addCategory(){flushEditors();const id='cat_'+Date.now();editBuffer.push({id,icon:'📌',color:'ic-a',title:'Nová kategorie',hint:'',keywords:'',contacts:[],info:[]});selectedEditCatId=id;renderCatList();renderContactsEditor();renderInfoEditor();}
 function deleteSelectedCategory(){if(!selectedEditCatId||!confirm('Opravdu smazat?'))return;editBuffer=editBuffer.filter(c=>c.id!==selectedEditCatId);selectedEditCatId=editBuffer[0]?.id||null;renderCatList();renderContactsEditor();renderInfoEditor();}
 
