@@ -1347,29 +1347,31 @@ ${dataStr}`;
 let aiHistory = [];
 
 function parseAiMarkdown(text) {
-  let t = text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.+?)\*/g, '<em>$1</em>');
-  // numbered lists
-  const numRe = /^(\d+)\. (.+)$/gm;
-  let numMatch, numItems = [], numLast = 0;
-  while ((numMatch = numRe.exec(t)) !== null) {
-    numItems.push({index: numMatch.index, len: numMatch[0].length, text: numMatch[2]});
-  }
-  if (numItems.length) {
-    let result = '', prev = 0;
-    const listHtml = numItems.map(i => '<li>' + i.text + '</li>').join('');
-    result = t.slice(0, numItems[0].index) + '<ol style="padding-left:16px;margin:6px 0;font-size:13px">' + listHtml + '</ol>' + t.slice(numItems[numItems.length-1].index + numItems[numItems.length-1].len);
-    t = result;
-  }
-  // bullet lists
-  t = t.replace(/^[-] (.+)$/gm, '<li>$1</li>');
-  t = t.replace(/(<li>.+<\/li>(\n<li>.+<\/li>)*)/g, '<ul style="padding-left:16px;margin:6px 0;font-size:13px">$1</ul>');
-  t = t.replace(/\n\n/g, '<br><br>').replace(/\n/g, '<br>');
-  return t;
+  // Simple markdown: convert newlines, numbered lists, bullets
+  // Bold/italic skipped to avoid regex issues
+  let lines = text.split('\n');
+  let html = '';
+  let inOl = false, inUl = false;
+  lines.forEach(function(line) {
+    var numMatch = line.match(/^(\d+)\. (.+)$/);
+    var bulMatch = line.match(/^[-] (.+)$/);
+    var boldLine = line.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    if (numMatch) {
+      if (!inOl) { if (inUl) { html += '</ul>'; inUl = false; } html += '<ol style="padding-left:16px;margin:6px 0;font-size:13px">'; inOl = true; }
+      html += '<li>' + numMatch[2].replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>') + '</li>';
+    } else if (bulMatch) {
+      if (!inUl) { if (inOl) { html += '</ol>'; inOl = false; } html += '<ul style="padding-left:16px;margin:6px 0;font-size:13px">'; inUl = true; }
+      html += '<li>' + bulMatch[1].replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>') + '</li>';
+    } else {
+      if (inOl) { html += '</ol>'; inOl = false; }
+      if (inUl) { html += '</ul>'; inUl = false; }
+      if (line === '') { html += '<br>'; }
+      else { html += '<p style="margin:4px 0">' + boldLine + '</p>'; }
+    }
+  });
+  if (inOl) html += '</ol>';
+  if (inUl) html += '</ul>';
+  return html;
 }
 
 async function sendAiMsg() {
