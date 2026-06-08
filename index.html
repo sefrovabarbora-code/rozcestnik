@@ -594,7 +594,7 @@ body {
 </div>
 
 <!-- EDIT PIN OVERLAY -->
-<div class="overlay" id="editPinOverlay">
+<div class="pin-overlay" id="editPinOverlay">
   <div class="pin-box">
     <h3>✎ Editace dat</h3>
     <p>Zadejte PIN pro úpravu dat</p>
@@ -1506,8 +1506,8 @@ function scrollToBubble(catId) {
 }
 
 let editPinBuffer='';
-function openEditPinOverlay(){editPinBuffer='';updateEditPinDots();document.getElementById('editPinError').textContent='';document.getElementById('editPinOverlay').classList.add('show');}
-function closeEditPinOverlay(){document.getElementById('editPinOverlay').classList.remove('show');editPinBuffer='';}
+function openEditPinOverlay(){editPinBuffer='';updateEditPinDots();document.getElementById('editPinError').textContent='';document.getElementById('editPinOverlay').classList.add('show');document.getElementById('editPinOverlay').style.display='flex';}
+function closeEditPinOverlay(){document.getElementById('editPinOverlay').classList.remove('show');document.getElementById('editPinOverlay').style.display='none';editPinBuffer='';}
 function editPinKey(k){
   if(k==='del'){editPinBuffer=editPinBuffer.slice(0,-1);updateEditPinDots();return;}
   if(editPinBuffer.length>=4)return;editPinBuffer+=k;updateEditPinDots();
