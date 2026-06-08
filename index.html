@@ -1182,7 +1182,7 @@ function renderCatList(){
   editBuffer.forEach(cat=>{
     const item=document.createElement('div');item.className='cat-edit-item'+(cat.id===selectedEditCatId?' selected':'');
     item.innerHTML=`<span class="cat-edit-icon">${cat.icon}</span><div class="cat-edit-info"><div class="cat-edit-name">${esc(cat.title)}</div><div class="cat-edit-count">${cat.contacts.length} kontaktů · ${cat.info.length} info bloků</div></div>`;
-    item.onclick=()=>{flushEditors();selectedEditCatId=cat.id;renderCatList();renderContactsEditor();renderInfoEditor();document.getElementById('delCatBtn').style.display='inline-flex';};
+    item.onclick=()=>{flushEditors();selectedEditCatId=cat.id;renderCatList();renderContactsEditor();renderInfoEditor();renderCatNameEditor();document.getElementById('delCatBtn').style.display='inline-flex';};
     el.appendChild(item);
   });
   document.getElementById('delCatBtn').style.display=selectedEditCatId?'inline-flex':'none';
