@@ -593,6 +593,28 @@ body {
   </div>
 </div>
 
+<!-- EDIT PIN OVERLAY -->
+<div class="overlay" id="editPinOverlay">
+  <div class="pin-box">
+    <h3>✎ Editace dat</h3>
+    <p>Zadejte PIN pro úpravu dat</p>
+    <div class="pin-dots" id="editPinDots">
+      <div class="pin-dot" id="ed0"></div><div class="pin-dot" id="ed1"></div>
+      <div class="pin-dot" id="ed2"></div><div class="pin-dot" id="ed3"></div>
+    </div>
+    <div class="pin-numpad">
+      <button class="pin-key" onclick="editPinKey('1')">1</button><button class="pin-key" onclick="editPinKey('2')">2</button><button class="pin-key" onclick="editPinKey('3')">3</button>
+      <button class="pin-key" onclick="editPinKey('4')">4</button><button class="pin-key" onclick="editPinKey('5')">5</button><button class="pin-key" onclick="editPinKey('6')">6</button>
+      <button class="pin-key" onclick="editPinKey('7')">7</button><button class="pin-key" onclick="editPinKey('8')">8</button><button class="pin-key" onclick="editPinKey('9')">9</button>
+      <button class="pin-key" onclick="editPinKey('del')" style="font-size:14px">⌫</button>
+      <button class="pin-key" onclick="editPinKey('0')">0</button>
+      <button class="pin-key" style="opacity:0;pointer-events:none">·</button>
+    </div>
+    <div class="pin-error" id="editPinError"></div>
+    <button class="pin-cancel" onclick="closeEditPinOverlay()">Zrušit</button>
+  </div>
+</div>
+
 <!-- EDIT OVERLAY -->
 <div class="edit-overlay" id="editOverlay">
   <div class="edit-modal">
