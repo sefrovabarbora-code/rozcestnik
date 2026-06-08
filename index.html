@@ -8,21 +8,32 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 :root {
-  --bg: #0f0f0f;
-  --bg2: #1a1a1a;
-  --bg3: #222;
+  --bg: #0d0d0d;
+  --bg2: #161616;
+  --bg3: #1f1f1f;
+  --bg4: #252525;
   --border: rgba(255,255,255,0.08);
-  --border2: rgba(255,255,255,0.15);
+  --border2: rgba(255,255,255,0.14);
+  --border3: rgba(255,255,255,0.22);
   --text: #f0f0f0;
   --text2: #999;
-  --text3: #666;
-  --accent: #f0c040;
-  --accent2: rgba(240,192,64,0.12);
-  --accent3: rgba(240,192,64,0.06);
-  --danger: #e55;
-  --success: #4c9;
-  --radius: 10px;
-  --radius-sm: 6px;
+  --text3: #555;
+  --accent: #F5E100;
+  --accent2: rgba(245,225,0,0.12);
+  --accent3: rgba(245,225,0,0.05);
+  --danger: #E8000D;
+  --success: #40c878;
+  --pub-c: #40c878;
+  --pub-bg: rgba(64,200,120,0.1);
+  --int-c: #F5E100;
+  --int-bg: rgba(245,225,0,0.1);
+  --r: 4px;
+  --rs: 4px;
+  --radius: 4px;
+  --radius-sm: 4px;
+  --yellow: #F5E100;
+  --fg: #f0f0f0;
+  --fg2: #999;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
@@ -92,7 +103,7 @@ body {
   gap: 10px;
   background: var(--bg2);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: 4px;
   padding: 10px 16px;
   margin-bottom: 20px;
   transition: border-color 0.15s;
@@ -118,7 +129,7 @@ body {
 .bubble {
   background: var(--bg2);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: 4px;
   padding: 16px;
   cursor: pointer;
   transition: all 0.15s;
@@ -161,7 +172,7 @@ body {
   display: none;
   background: var(--bg2);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: 4px;
   margin-top: 12px;
   overflow: hidden;
 }
@@ -266,7 +277,7 @@ body {
 .edit-modal {
   background: var(--bg2);
   border: 1px solid var(--border2);
-  border-radius: var(--radius);
+  border-radius: 4px;
   width: 100%;
   max-width: 700px;
   margin: auto;
@@ -382,7 +393,7 @@ body {
 .pin-box {
   background: var(--bg2);
   border: 1px solid var(--border2);
-  border-radius: var(--radius);
+  border-radius: 4px;
   padding: 32px;
   width: 280px;
   text-align: center;
@@ -482,7 +493,7 @@ body {
 .ai-msg{display:flex;gap:10px;align-items:flex-start}
 .ai-msg.user{flex-direction:row-reverse}
 .ai-bubble{font-size:13px;line-height:1.6;padding:9px 13px;border-radius:var(--r);max-width:85%}
-.ai-msg.user .ai-bubble{background:var(--accent2);border:1px solid rgba(240,192,64,0.25);color:var(--text)}
+.ai-msg.user .ai-bubble{background:rgba(245,225,0,0.1);border:1px solid rgba(245,225,0,0.25);color:var(--text)}
 .ai-msg.bot .ai-bubble{background:var(--bg3);border:1px solid var(--border);color:var(--text2)}
 .ai-msg.bot .ai-bubble a{color:var(--accent);cursor:pointer;text-decoration:underline}
 .ai-avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;margin-top:2px}
@@ -502,9 +513,9 @@ body {
 .ai-typing span:nth-child(3){animation-delay:0.4s}
 @keyframes tdot{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
 
-.sec-btn{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;padding:6px 14px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;transition:all 0.15s;white-space:nowrap}
+.sec-btn{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:6px 16px;border-radius:2px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;transition:all 0.15s;white-space:nowrap}
 .sec-btn:hover{background:var(--bg3);color:var(--text);border-color:var(--border3)}
-.sec-btn.active{background:var(--accent2);border-color:var(--accent);color:var(--accent)}
+.sec-btn.active{background:var(--accent);border-color:var(--accent);color:#111;font-weight:800}
 </style>
 </head>
 <body>
@@ -680,7 +691,7 @@ body {
 <script>
 const API_KEY='$2a$10$eWIWXhPM0SwH0406PZezkuM3Efo1gjKdDldXnvPIeRd.AJBHrtRqm';
 const JSONBIN_BASE='https://api.jsonbin.io/v3';
-const PIN_KEY='ov_pin';const EDIT_PIN_KEY='ov_edit_pin';const BINS_KEY='ov_bins';const LOCAL_KEY='ov_local';
+const PIN_KEY='ov_pin';const EDIT_PIN_KEY='ov_edit_pin';const BINS_KEY='ov_bins';const LOCAL_KEY='ov_local';const LOG_KEY='ov_log_bin';
 
 const DEFAULT_CATEGORIES=[
   {id:'vedeni',icon:'👑',color:'ic-a',title:'Vedení rally',hint:'Ředitel, zástupci, tajemník',keywords:'vedení ředitel zástupce tajemník štípek šefr sýkorová',
@@ -856,7 +867,7 @@ const DEFAULT_CATEGORIES=[
     contacts:[
       {name:'Barbora Šefrová',role:'Hlavní činovník pro tisk, web a sociální sítě',phone:'',vis:'internal'},
       {name:'Radovan Eliáš',role:'Media delegát AS AČR',phone:'',vis:'public'},
-      {name:'Petr Eliáš',role:'Livestream a video obsah na vlastních sociálních sítích',phone:'',vis:'public'},
+      
     ],
     info:[
       {label:'Tiskové středisko',text:'MKC Příbram, Špitálská 18 (Špalíček)\nGPS: N 49°41.22523\', E 14°0.51205\'\n24. 7.: 14:30–21:00\n25. 7.: 07:30–10:30 a 14:00–20:00',vis:'public'},
@@ -918,7 +929,7 @@ const DEFAULT_CATEGORIES=[
 let categories=[];let editBuffer=null;let selectedEditCatId=null;let activeCatId=null;let pinBuffer='';let isInternal=false;
 
 function getPin(){return localStorage.getItem(PIN_KEY)||'9889'}
-function getEditPin(){return localStorage.getItem(EDIT_PIN_KEY)||'9889'}
+function getEditPin(){return localStorage.getItem(EDIT_PIN_KEY)||'9108'}
 function getBins(){
   try{
     const stored = JSON.parse(localStorage.getItem(BINS_KEY))||{};
@@ -1040,7 +1051,9 @@ function toggleDetail(cat,btn){
     html+=`<div class="section-label">Kontakty</div><div class="contacts-grid">`;
     cat.contacts.forEach((c,i)=>{
       const ini=c.name.split(' ').map(w=>w[0]).filter((_,j,a)=>j===0||j===a.length-1).join('').toUpperCase();
-      html+=`<div class="contact-card"><div class="contact-av ${avC[i%6]}">${ini}</div><div class="contact-info"><div class="contact-name">${esc(c.name)}${vt(c.vis||'public')}</div><div class="contact-role">${esc(c.role)}</div>${c.phone?`<a class="contact-phone" href="tel:${c.phone.replace(/\s/g,'')}">📞 ${esc(c.phone)}</a>`:''}</div></div>`;
+      const zodItems = (c.zodpovida||'').split('\n').map(s=>s.trim()).filter(Boolean);
+      const zodHtml = (isInternal && zodItems.length) ? `<div style="margin-top:6px;border-top:1px solid rgba(255,255,255,0.06);padding-top:6px"><div style="font-size:10px;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);margin-bottom:4px">Zodpovídá za</div><ul style="margin:0;padding-left:14px;font-size:12px;color:var(--text2);line-height:1.6">${zodItems.map(z=>`<li>${esc(z)}</li>`).join('')}</ul></div>` : '';
+      html+=`<div class="contact-card"><div class="contact-av ${avC[i%6]}">${ini}</div><div class="contact-info"><div class="contact-name">${esc(c.name)}${vt(c.vis||'public')}</div><div class="contact-role">${esc(c.role)}</div>${c.phone?`<a class="contact-phone" href="tel:${c.phone.replace(/\s/g,'')}">📞 ${esc(c.phone)}</a>`:''}${zodHtml}</div></div>`;
     });html+='</div>';
   }
   if(cat.info.length){
@@ -1102,7 +1115,7 @@ function updatePinDots(){for(let i=0;i<4;i++)document.getElementById('d'+i).clas
 function openEditOverlay(){
   editBuffer=JSON.parse(JSON.stringify(categories));selectedEditCatId=editBuffer[0]?.id||null;
   renderCatList();renderContactsEditor();renderInfoEditor();
-  const bins=getBins();document.getElementById('pubBinId').value=bins.pubId||'';document.getElementById('privBinId').value=bins.privId||'';
+  const bins=getBins();document.getElementById('pubBinId').value=bins.pubId||'';document.getElementById('privBinId').value=bins.privId||'';document.getElementById('logBinId').value=getLogBin()||'';
   switchTab('cats');document.getElementById('editOverlay').classList.add('show');
 }
 function closeEditOverlay(){document.getElementById('editOverlay').classList.remove('show');}
@@ -1138,7 +1151,9 @@ function renderContactsEditor(){
   const el=document.getElementById('contactsEditor');el.innerHTML='';if(!cat)return;
   cat.contacts.forEach((c,i)=>{
     const v=c.vis||'public';const row=document.createElement('div');row.className='contact-edit-row';row.dataset.idx=i;
-    row.innerHTML=`<input class="cer-input" placeholder="Jméno" value="${esc(c.name)}" data-field="name"><input class="cer-input" placeholder="Role / funkce" value="${esc(c.role)}" data-field="role"><input class="cer-input" placeholder="Telefon" value="${esc(c.phone||'')}" data-field="phone"><select class="vis-sel ${v}" data-field="vis" onchange="this.className='vis-sel '+this.value"><option value="public" ${v==='public'?'selected':''}>Veřejné</option><option value="internal" ${v==='internal'?'selected':''}>Interní</option></select><button class="del-btn" onclick="removeContactRow(${i})">✕</button>`;
+    const zodpovida = c.zodpovida || '';
+    row.innerHTML=`<input class="cer-input" placeholder="Jméno" value="${esc(c.name)}" data-field="name"><input class="cer-input" placeholder="Role / funkce" value="${esc(c.role)}" data-field="role"><input class="cer-input" placeholder="Telefon" value="${esc(c.phone||'')}" data-field="phone"><select class="vis-sel ${v}" data-field="vis" onchange="this.className='vis-sel '+this.value"><option value="public" ${v==='public'?'selected':''}>Veřejné</option><option value="internal" ${v==='internal'?'selected':''}>Interní</option></select><button class="del-btn" onclick="removeContactRow(${i})">✕</button>
+    <textarea class="cer-input" placeholder="Zodpovídá za / dodává (každá věc na nový řádek)" data-field="zodpovida" style="grid-column:1/-1;min-height:60px;resize:vertical;font-size:12px;">${esc(zodpovida)}</textarea>`;
     el.appendChild(row);
   });
 }
@@ -1163,7 +1178,14 @@ function flushEditors(){
   document.querySelectorAll('#infoEditor .info-edit-row').forEach((row,i)=>{if(!cat.info[i])return;row.querySelectorAll('[data-field]').forEach(el=>{cat.info[i][el.dataset.field]=el.value;});});
 }
 
-function saveBinIds(){const pubId=document.getElementById('pubBinId').value.trim();const privId=document.getElementById('privBinId').value.trim();saveBinsLocal({pubId,privId});alert('BIN IDs uloženy ✓');}
+function saveBinIds(){
+  const pubId=document.getElementById('pubBinId').value.trim();
+  const privId=document.getElementById('privBinId').value.trim();
+  const logId=document.getElementById('logBinId').value.trim();
+  saveBinsLocal({pubId,privId});
+  if(logId) localStorage.setItem(LOG_KEY, logId);
+  alert('BIN IDs uloženy ✓');
+}
 async function initBins(){
   if(!confirm('Vytvoří se 2 nové JSONBin BINy a přepíší stávající IDs. Pokračovat?'))return;
   setSyncStatus('loading','Vytvářím BINy…');
@@ -1185,8 +1207,8 @@ function resetData(){if(!confirm('Obnovit výchozí data? Všechny změny budou 
 
 function exportExcel(){
   const wb=XLSX.utils.book_new();
-  const cr=[['Kategorie','Jméno','Role','Telefon','Viditelnost']];
-  categories.forEach(cat=>cat.contacts.forEach(c=>cr.push([cat.title,c.name,c.role,c.phone||'',c.vis||'public'])));
+  const cr=[['Kategorie','Jméno','Role','Telefon','Viditelnost','Zodpovídá za']];
+  categories.forEach(cat=>cat.contacts.forEach(c=>cr.push([cat.title,c.name,c.role,c.phone||'',c.vis||'public',(c.zodpovida||'').replace(/\n/g,', ')])));
   XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(cr),'Kontakty');
   const ir=[['Kategorie','Nadpis','Text','Viditelnost']];
   categories.forEach(cat=>cat.info.forEach(inf=>ir.push([cat.title,inf.label,inf.text,inf.vis||'public'])));
@@ -1204,7 +1226,7 @@ function importExcel(event){
       const contacts=XLSX.utils.sheet_to_json(cs,{header:1}).slice(1);
       const infos=is?XLSX.utils.sheet_to_json(is,{header:1}).slice(1):[];
       const newCats=JSON.parse(JSON.stringify(categories));newCats.forEach(c=>{c.contacts=[];c.info=[];});
-      contacts.forEach(([catName,name,role,phone,vis])=>{let cat=newCats.find(c=>c.title.toLowerCase()===(catName||'').toLowerCase());if(!cat){cat={id:'imp_'+Date.now(),icon:'📌',color:'ic-a',title:catName||'Import',hint:'',keywords:'',contacts:[],info:[]};newCats.push(cat);}if(name)cat.contacts.push({name,role:role||'',phone:phone||'',vis:vis||'public'});});
+      contacts.forEach(([catName,name,role,phone,vis,zodpovida])=>{let cat=newCats.find(c=>c.title.toLowerCase()===(catName||'').toLowerCase());if(!cat){cat={id:'imp_'+Date.now(),icon:'📌',color:'ic-a',title:catName||'Import',hint:'',keywords:'',contacts:[],info:[]};newCats.push(cat);}if(name)cat.contacts.push({name,role:role||'',phone:phone||'',vis:vis||'public'});});
       infos.forEach(([catName,label,text,vis])=>{const cat=newCats.find(c=>c.title.toLowerCase()===(catName||'').toLowerCase());if(cat&&label)cat.info.push({label,text:text||'',vis:vis||'public'});});
       categories=newCats;localStorage.setItem(LOCAL_KEY,JSON.stringify(categories));
       refreshView();alert('Import úspěšný ✓\nNezapomeň uložit a synchronizovat do cloudu (tlačítko Upravit data → Uložit).');
@@ -1217,6 +1239,66 @@ function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').repla
 
 (async()=>{await loadFromCloud();refreshView();})();
 
+
+// ══════════════════════════════════════════════
+// LOGOVÁNÍ KONVERZACÍ
+// ══════════════════════════════════════════════
+function getLogBin(){return localStorage.getItem(LOG_KEY)||'';}
+
+async function logConversation(question, answer) {
+  const logBinId = getLogBin();
+  if (!logBinId) return; // log bin not set up yet
+  try {
+    // Read existing logs
+    let logs = [];
+    try {
+      const r = await binFetch('GET', '/b/' + logBinId + '/latest');
+      logs = r.record?.logs || [];
+    } catch(e) {}
+    // Add new entry
+    logs.unshift({
+      ts: new Date().toISOString(),
+      q: question,
+      a: answer,
+      mode: isInternal ? 'internal' : 'public'
+    });
+    // Keep max 500 entries
+    if (logs.length > 500) logs = logs.slice(0, 500);
+    await binFetch('PUT', '/b/' + logBinId, { logs });
+  } catch(e) { console.log('Log error:', e); }
+}
+
+async function initLogBin() {
+  if (getLogBin()) { alert('Log BIN již existuje: ' + getLogBin()); return; }
+  try {
+    const id = await createBin({ logs: [] });
+    localStorage.setItem(LOG_KEY, id);
+    document.getElementById('logBinId').value = id;
+    alert('Log BIN vytvořen: ' + id);
+  } catch(e) { alert('Chyba: ' + e.message); }
+}
+
+async function viewLogs() {
+  const logBinId = getLogBin();
+  if (!logBinId) { alert('Log BIN není nastaven. Nejdřív ho vytvoř v Nastavení.'); return; }
+  try {
+    const r = await binFetch('GET', '/b/' + logBinId + '/latest');
+    const logs = r.record?.logs || [];
+    if (!logs.length) { alert('Žádné záznamy zatím.'); return; }
+    exportLogsExcel(logs);
+  } catch(e) { alert('Chyba načtení: ' + e.message); }
+}
+
+function exportLogsExcel(logs) {
+  const wb = XLSX.utils.book_new();
+  const rows = [['Datum a čas', 'Dotaz', 'Odpověď AI', 'Režim']];
+  logs.forEach(l => {
+    const date = new Date(l.ts).toLocaleString('cs');
+    rows.push([date, l.q, l.a, l.mode === 'internal' ? 'Interní' : 'Veřejný']);
+  });
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rows), 'Konverzace');
+  XLSX.writeFile(wb, 'rally-pribram-konverzace.xlsx');
+}
 
 // ══════════════════════════════════════════════
 // AI ASISTENT
@@ -1264,6 +1346,32 @@ ${dataStr}`;
 
 let aiHistory = [];
 
+function parseAiMarkdown(text) {
+  let t = text
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>');
+  // numbered lists
+  t = t.replace(/((?:^\d+\. .+
+?)+)/gm, (m) => {
+    const items = m.trim().split('
+').map(l => `<li>${l.replace(/^\d+\.\s/,'')}</li>`).join('');
+    return `<ol style="padding-left:16px;margin:6px 0;font-size:13px">${items}</ol>`;
+  });
+  // bullet lists
+  t = t.replace(/((?:^[-•] .+
+?)+)/gm, (m) => {
+    const items = m.trim().split('
+').map(l => `<li>${l.replace(/^[-•]\s/,'')}</li>`).join('');
+    return `<ul style="padding-left:16px;margin:6px 0;font-size:13px">${items}</ul>`;
+  });
+  t = t.replace(/
+
+/g, '<br><br>').replace(/
+/g, '<br>');
+  return t;
+}
+
 async function sendAiMsg() {
   const input = document.getElementById('aiInput');
   const msg = input.value.trim();
@@ -1291,6 +1399,7 @@ async function sendAiMsg() {
     const reply = data.content?.[0]?.text || 'Omlouvám se, nepodařilo se získat odpověď.';
 
     aiHistory.push({ role: 'assistant', content: reply });
+    logConversation(msg, reply); // log to JSONBin
 
     // Find matching category and highlight it
     const matchedCat = findMatchingCategory(msg + ' ' + reply);
@@ -1339,7 +1448,11 @@ function addAiMessage(role, text, matchedCat) {
 
   const bubble = document.createElement('div');
   bubble.className = 'ai-bubble';
-  bubble.textContent = text;
+  if (role === 'bot') {
+    bubble.innerHTML = parseAiMarkdown(text);
+  } else {
+    bubble.textContent = text;
+  }
 
   if (role === 'bot' && matchedCat) {
     const link = document.createElement('div');
