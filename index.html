@@ -1348,27 +1348,27 @@ let aiHistory = [];
 
 function parseAiMarkdown(text) {
   let t = text
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.+?)\*/g, '<em>$1</em>');
   // numbered lists
-  t = t.replace(/((?:^\d+\. .+
-?)+)/gm, (m) => {
-    const items = m.trim().split('
-').map(l => `<li>${l.replace(/^\d+\.\s/,'')}</li>`).join('');
-    return `<ol style="padding-left:16px;margin:6px 0;font-size:13px">${items}</ol>`;
-  });
+  const numRe = /^(\d+)\. (.+)$/gm;
+  let numMatch, numItems = [], numLast = 0;
+  while ((numMatch = numRe.exec(t)) !== null) {
+    numItems.push({index: numMatch.index, len: numMatch[0].length, text: numMatch[2]});
+  }
+  if (numItems.length) {
+    let result = '', prev = 0;
+    const listHtml = numItems.map(i => '<li>' + i.text + '</li>').join('');
+    result = t.slice(0, numItems[0].index) + '<ol style="padding-left:16px;margin:6px 0;font-size:13px">' + listHtml + '</ol>' + t.slice(numItems[numItems.length-1].index + numItems[numItems.length-1].len);
+    t = result;
+  }
   // bullet lists
-  t = t.replace(/((?:^[-•] .+
-?)+)/gm, (m) => {
-    const items = m.trim().split('
-').map(l => `<li>${l.replace(/^[-•]\s/,'')}</li>`).join('');
-    return `<ul style="padding-left:16px;margin:6px 0;font-size:13px">${items}</ul>`;
-  });
-  t = t.replace(/
-
-/g, '<br><br>').replace(/
-/g, '<br>');
+  t = t.replace(/^[-] (.+)$/gm, '<li>$1</li>');
+  t = t.replace(/(<li>.+<\/li>(\n<li>.+<\/li>)*)/g, '<ul style="padding-left:16px;margin:6px 0;font-size:13px">$1</ul>');
+  t = t.replace(/\n\n/g, '<br><br>').replace(/\n/g, '<br>');
   return t;
 }
 
